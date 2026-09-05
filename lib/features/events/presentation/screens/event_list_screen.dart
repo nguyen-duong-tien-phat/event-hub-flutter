@@ -4,6 +4,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../data/models/category.dart';
+import '../widgets/category_pill.dart';
+
 final Geocoding _geocoding = Geocoding();
 
 class EventListScreen extends StatefulWidget {
@@ -16,13 +19,7 @@ class EventListScreen extends StatefulWidget {
 class _EventListScreenState extends State<EventListScreen> {
   String? _locationText;
   bool _permissionDenied = false;
-
-  String _selectedCategory = 'My feed';
-  final List<Map<String, dynamic>> _categories = [
-    {'icon': Icons.bolt, 'label': 'My feed'},
-    {'icon': Icons.restaurant, 'label': 'Food'},
-    {'icon': Icons.music_note, 'label': 'Concerts'},
-  ];
+  String _selectedKey = 'my_feed';
 
   @override
   void initState() {
@@ -46,8 +43,8 @@ class _EventListScreenState extends State<EventListScreen> {
 
     final position = await Geolocator.getCurrentPosition();
 
-    // geocoding v5.0.0 moved to an instance-based API: create a
-    // Geocoding() instance and call methods on it.
+    // geocoding v5.0.0 uses an instance-based API: create a Geocoding()
+    // instance and call methods on it (not a top-level function).
     final placemarks = await _geocoding.placemarkFromCoordinates(
       position.latitude,
       position.longitude,
@@ -70,14 +67,14 @@ class _EventListScreenState extends State<EventListScreen> {
             children: [
               const SizedBox(height: 12),
 
+              // --- Location ---
               if (!_permissionDenied)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Icon(
-                      Icons.location_on_rounded,
-                      color: Colors.red,
+                      LucideIcons.mapPin,
+                      color: AppColors.accent,
                       size: 18,
                     ),
                     const SizedBox(width: 4),
@@ -102,6 +99,7 @@ class _EventListScreenState extends State<EventListScreen> {
 
               const SizedBox(height: 20),
 
+              // --- Search bar ---
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -110,6 +108,13 @@ class _EventListScreenState extends State<EventListScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.card,
                   borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
@@ -142,22 +147,23 @@ class _EventListScreenState extends State<EventListScreen> {
 
               const SizedBox(height: 20),
 
+              // --- Category pills ---
               SizedBox(
                 height: 40,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
-                  children: _categories.map((category) {
+                  children: defaultCategories.map((category) {
                     return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: _CategoryPill(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: CategoryPill(
+                        icon: category.icon,
+                        label: category.label,
+                        isSelected: category.key == _selectedKey,
                         onTap: () {
                           setState(() {
-                            _selectedCategory = category['label'];
+                            _selectedKey = category.key;
                           });
                         },
-                        icon: category['icon'],
-                        label: category['label'],
-                        isSelected: category['label'] == _selectedCategory,
                       ),
                     );
                   }).toList(),
@@ -165,53 +171,6 @@ class _EventListScreenState extends State<EventListScreen> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _CategoryPill extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _CategoryPill({
-    required this.icon,
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.accent : AppColors.card,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 16,
-              color: isSelected ? Colors.white : AppColors.textMuted,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? Colors.white : AppColors.textMuted,
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-              ),
-            ),
-          ],
         ),
       ),
     );
