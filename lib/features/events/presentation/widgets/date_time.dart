@@ -17,13 +17,13 @@ class DateTimeWidget extends StatelessWidget {
             const Icon(
               Icons.calendar_today_rounded,
               size: 15,
-              color: AppColors.accentOnDark,
+              color: AppColors.accent,
             ),
             const SizedBox(width: 7),
             Text(
               '${event.weekdayFull}, ${event.monthAbbreviated} ${event.dayNumber}',
               style: const TextStyle(
-                color: AppColors.textOnDark,
+                color: AppColors.textPrimary,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -36,15 +36,12 @@ class DateTimeWidget extends StatelessWidget {
             const Icon(
               Icons.schedule_rounded,
               size: 15,
-              color: AppColors.textMutedOnDark,
+              color: AppColors.textMuted,
             ),
             const SizedBox(width: 7),
             Text(
               event.formattedTime,
-              style: const TextStyle(
-                color: AppColors.textMutedOnDark,
-                fontSize: 13,
-              ),
+              style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
             ),
           ],
         ),

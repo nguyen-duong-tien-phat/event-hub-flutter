@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const background = Color(0xFFF0EDE6);
-  static const card = Color(0xFFFFFFFF);
-  static const textPrimary = Color(0xFF2C2C2A);
-  static const textMuted = Color(0xFF8B8580);
-  static const accent = Color(0xFF5C3A28);
+  static const background = Color(0xFF1C1712);
+  static const card = Color(0xFF2A2420);
+  static const border = Color(0xFF3C332C);
+  static const textPrimary = Color(0xFFF5F1EA);
+  static const textMuted = Color(0xFFA89E92);
 
-  // Used specifically on the event detail screen, where the hero
-  // image blends into a dark surface (rest of the app stays light).
-  static const detailBackground = Color(0xFF1C1712);
-  static const detailCard = Color(0xFF2A2420);
-  static const detailBorder = Color(0xFF3C332C);
-  static const accentOnDark = Color(0xFFE0A672); // warm tan — pops on dark
-  static const textOnDark = Color(0xFFF5F1EA);
-  static const textMutedOnDark = Color(0xFFA89E92);
+  // Warm tan — text/icon color for anything sitting directly on a
+  // dark background or card (pin icon, price text, cursor, etc.).
+  static const accent = Color(0xFFE0A672);
+
+  // Dark brown — used only as a SOLID fill behind white text or
+  // dark text on a light chip (buttons, selected pill background).
+  // Do not use as text color on a dark surface — too low contrast.
+  static const accentStrong = Color(0xFF5C3A28);
 }
 
 class AppTheme {
-  static ThemeData get light => ThemeData(
-    brightness: Brightness.light,
+  static ThemeData get dark => ThemeData(
+    brightness: Brightness.dark,
     scaffoldBackgroundColor: AppColors.background,
     cardColor: AppColors.card,
-    colorScheme: const ColorScheme.light(
+    colorScheme: const ColorScheme.dark(
       primary: AppColors.accent,
       surface: AppColors.card,
     ),

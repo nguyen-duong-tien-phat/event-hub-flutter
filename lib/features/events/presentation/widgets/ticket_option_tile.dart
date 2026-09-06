@@ -18,12 +18,12 @@ class TicketOptionTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppColors.detailCard,
           borderRadius: BorderRadius.circular(14),
+          color: AppColors.card,
           border: Border.all(
             color: isLowStock
-                ? AppColors.accentOnDark.withOpacity(0.5)
-                : AppColors.detailBorder,
+                ? AppColors.accent.withOpacity(0.5)
+                : AppColors.border,
           ),
         ),
         child: Row(
@@ -33,12 +33,12 @@ class TicketOptionTile extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.accentOnDark.withOpacity(0.15),
+                color: AppColors.accent.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(
                 Icons.confirmation_number_outlined,
-                color: AppColors.accentOnDark,
+                color: AppColors.accent,
                 size: 20,
               ),
             ),
@@ -51,7 +51,7 @@ class TicketOptionTile extends StatelessWidget {
                   Text(
                     ticket.type,
                     style: const TextStyle(
-                      color: AppColors.textOnDark,
+                      color: AppColors.textPrimary,
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
                     ),
@@ -67,8 +67,8 @@ class TicketOptionTile extends StatelessWidget {
                       color: ticket.isSoldOut
                           ? Colors.redAccent
                           : isLowStock
-                          ? AppColors.accentOnDark
-                          : AppColors.textMutedOnDark,
+                          ? AppColors.accent
+                          : AppColors.textMuted,
                       fontSize: 12,
                       fontWeight: isLowStock
                           ? FontWeight.w600
@@ -83,7 +83,7 @@ class TicketOptionTile extends StatelessWidget {
             Text(
               '\$${ticket.price.toStringAsFixed(2)}',
               style: const TextStyle(
-                color: AppColors.textOnDark,
+                color: AppColors.textPrimary,
                 fontWeight: FontWeight.w700,
                 fontSize: 16,
               ),

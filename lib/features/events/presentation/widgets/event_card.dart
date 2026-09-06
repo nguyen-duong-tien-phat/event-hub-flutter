@@ -68,19 +68,31 @@ class EventCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
-                      vertical: 6,
+                      vertical: 8,
                     ),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.8),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Text(
-                      event.formattedDate,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    child: Column(
+                      children: [
+                        Text(
+                          event.dayNumber,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          event.monthAbbreviated,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

@@ -22,13 +22,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final event = widget.event;
 
     return Scaffold(
-      backgroundColor: AppColors.detailBackground,
+      backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             expandedHeight: 250,
             pinned: true,
-            backgroundColor: AppColors.detailBackground,
+            backgroundColor: AppColors.background,
             leading: _CircleIconButton(
               icon: Icons.arrow_back,
               onTap: () => Navigator.pop(context),
@@ -50,8 +50,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         stops: const [0.0, 0.5, 1.0],
                         colors: [
                           Colors.transparent,
-                          AppColors.detailBackground.withOpacity(0.55),
-                          AppColors.detailBackground,
+                          AppColors.background.withOpacity(0.55),
+                          AppColors.background,
                         ],
                       ),
                     ),
@@ -70,7 +70,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   Text(
                     event.title,
                     style: const TextStyle(
-                      color: AppColors.textOnDark,
+                      color: AppColors.textPrimary,
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
                     ),
@@ -78,7 +78,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   Text(
                     event.location,
                     style: const TextStyle(
-                      color: AppColors.textMutedOnDark,
+                      color: AppColors.textMuted,
                       fontSize: 14,
                     ),
                   ),
@@ -95,14 +95,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             vertical: 10,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.detailCard,
+                            color: AppColors.card,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.detailBorder),
+                            border: Border.all(color: AppColors.border),
                           ),
                           child: Text(
                             event.formattedPrice!,
                             style: const TextStyle(
-                              color: AppColors.accentOnDark,
+                              color: AppColors.accent,
                               fontSize: 17,
                               fontWeight: FontWeight.w800,
                             ),
@@ -116,7 +116,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   const Text(
                     'About this event',
                     style: TextStyle(
-                      color: AppColors.textOnDark,
+                      color: AppColors.textPrimary,
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
                     ),
@@ -125,7 +125,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   Text(
                     event.description,
                     style: const TextStyle(
-                      color: AppColors.textMutedOnDark,
+                      color: AppColors.textMuted,
                       fontSize: 14,
                       height: 1.6,
                     ),
@@ -142,14 +142,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             const Icon(
                               Icons.check_circle,
                               size: 18,
-                              color: AppColors.accentOnDark,
+                              color: AppColors.accent,
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 point,
                                 style: const TextStyle(
-                                  color: AppColors.textOnDark,
+                                  color: AppColors.textPrimary,
                                   fontSize: 14,
                                   height: 1.4,
                                 ),
@@ -166,7 +166,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     const Text(
                       'Ticket options',
                       style: TextStyle(
-                        color: AppColors.textOnDark,
+                        color: AppColors.textPrimary,
                         fontWeight: FontWeight.w700,
                         fontSize: 16,
                       ),
@@ -185,7 +185,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     const Text(
                       'Organizer',
                       style: TextStyle(
-                        color: AppColors.textOnDark,
+                        color: AppColors.textPrimary,
                         fontWeight: FontWeight.w700,
                         fontSize: 16,
                       ),
@@ -194,7 +194,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     Text(
                       event.organizer!.fullName,
                       style: const TextStyle(
-                        color: AppColors.textMutedOnDark,
+                        color: AppColors.textMuted,
                         fontSize: 14,
                       ),
                     ),
@@ -211,10 +211,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
         decoration: const BoxDecoration(
-          color: AppColors.detailBackground,
-          border: Border(
-            top: BorderSide(color: AppColors.detailBorder, width: 1),
-          ),
+          color: AppColors.background,
+          border: Border(top: BorderSide(color: AppColors.border, width: 1)),
         ),
         child: Row(
           children: [
@@ -224,13 +222,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: AppColors.detailCard,
+                  color: AppColors.card,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.detailBorder),
+                  border: Border.all(color: AppColors.border),
                 ),
                 child: Icon(
                   _isSaved ? Icons.favorite : Icons.favorite_border,
-                  color: AppColors.accentOnDark,
+                  color: AppColors.accent,
                 ),
               ),
             ),

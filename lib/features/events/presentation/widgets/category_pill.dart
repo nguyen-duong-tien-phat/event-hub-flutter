@@ -26,23 +26,12 @@ class CategoryPill extends StatelessWidget {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
           child: Container(
-            padding: const EdgeInsets.only(left: 10, right: 12),
+            padding: const EdgeInsets.only(left: 10, right: 15),
             decoration: BoxDecoration(
               color: isSelected
-                  ? AppColors.accent.withOpacity(0.9)
-                  : Colors.white.withOpacity(0.6),
+                  ? AppColors.accentStrong
+                  : Colors.white.withOpacity(0.5),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.9),
-                width: 1.2,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -51,16 +40,16 @@ class CategoryPill extends StatelessWidget {
                   icon,
                   size: 16,
                   color: isSelected
-                      ? Colors.white.withOpacity(0.9)
-                      : AppColors.textMuted,
+                      ? AppColors.textPrimary
+                      : AppColors.accentStrong,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   label,
                   style: TextStyle(
                     color: isSelected
-                        ? Colors.white.withOpacity(0.9)
-                        : AppColors.textMuted,
+                        ? AppColors.textPrimary
+                        : AppColors.accentStrong,
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
                   ),

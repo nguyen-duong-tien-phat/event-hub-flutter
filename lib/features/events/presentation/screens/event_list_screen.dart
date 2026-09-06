@@ -1,14 +1,14 @@
 import 'package:event_hub_mobile/core/theme/app_theme.dart';
-import 'package:event_hub_mobile/features/events/data/models/event.dart';
-import 'package:event_hub_mobile/features/events/presentation/screens/event_detail_screen.dart';
-import 'package:event_hub_mobile/features/events/presentation/widgets/event_card.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../data/models/category.dart';
+import '../../data/models/event.dart';
 import '../widgets/category_pill.dart';
+import '../widgets/event_card.dart';
+import 'event_detail_screen.dart';
 
 final Geocoding _geocoding = Geocoding();
 
@@ -127,12 +127,12 @@ class _EventListScreenState extends State<EventListScreen> {
 
               const SizedBox(height: 20),
 
-              // --- Event Cards ---
+              // --- Event list ---
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.only(bottom: 16),
                   itemCount: mockEvents.length,
-                  itemBuilder: ((context, index) {
+                  itemBuilder: (context, index) {
                     final event = mockEvents[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
@@ -149,7 +149,7 @@ class _EventListScreenState extends State<EventListScreen> {
                         },
                       ),
                     );
-                  }),
+                  },
                 ),
               ),
             ],
