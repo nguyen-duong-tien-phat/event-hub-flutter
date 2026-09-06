@@ -1,4 +1,7 @@
 import 'package:event_hub_mobile/core/theme/app_theme.dart';
+import 'package:event_hub_mobile/features/events/data/models/event.dart';
+import 'package:event_hub_mobile/features/events/presentation/screens/event_detail_screen.dart';
+import 'package:event_hub_mobile/features/events/presentation/widgets/event_card.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
@@ -99,54 +102,6 @@ class _EventListScreenState extends State<EventListScreen> {
 
               const SizedBox(height: 20),
 
-              // --- Search bar ---
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.card,
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      LucideIcons.search,
-                      color: AppColors.textMuted,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextField(
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: AppColors.textPrimary,
-                        ),
-                        cursorColor: AppColors.accent,
-                        decoration: InputDecoration(
-                          hintText: 'Search events...',
-                          hintStyle: const TextStyle(
-                            color: AppColors.textMuted,
-                          ),
-                          border: InputBorder.none,
-                          isDense: true,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
               // --- Category pills ---
               SizedBox(
                 height: 40,
@@ -167,6 +122,34 @@ class _EventListScreenState extends State<EventListScreen> {
                       ),
                     );
                   }).toList(),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // --- Event Cards ---
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  itemCount: mockEvents.length,
+                  itemBuilder: ((context, index) {
+                    final event = mockEvents[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: EventCard(
+                        event: event,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  EventDetailScreen(event: event),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }),
                 ),
               ),
             ],
