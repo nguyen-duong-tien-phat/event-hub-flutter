@@ -1,5 +1,6 @@
 import 'package:event_hub_mobile/features/events/presentation/widgets/date_time.dart';
 import 'package:event_hub_mobile/features/events/presentation/widgets/ticket_option_tile.dart';
+import 'package:event_hub_mobile/features/tickets/presentations/screens/ticket_selection_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:event_hub_mobile/core/theme/app_theme.dart';
 
@@ -240,8 +241,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   onPressed: event.tickets.isEmpty
                       ? null
                       : () {
-                          // Navigate to ticket selection — next step
-                          // once that screen exists.
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  TicketSelectionScreen(event: event),
+                            ),
+                          );
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.accentStrong,

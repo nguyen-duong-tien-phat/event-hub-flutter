@@ -1,3 +1,4 @@
+import 'package:event_hub_mobile/features/tickets/data/models/ticket.dart';
 import 'package:intl/intl.dart';
 
 enum UserRole { admin, attendee, organizer }
@@ -14,32 +15,6 @@ class User {
     required this.fullName,
     required this.role,
   });
-}
-
-class Ticket {
-  final String id;
-  final String eventId; // reference only — avoids circular Event <-> Ticket
-  final String type; // e.g. "General", "VIP"
-  final double price;
-  final int totalQuantity;
-  final int remainingQuantity;
-
-  // Frontend-only for now, like Event.highlights — short perks specific
-  // to this ticket type (e.g. VIP gets meet & greet, General doesn't).
-  // Wire this to a real backend field once one exists.
-  final List<String> highlights;
-
-  const Ticket({
-    required this.id,
-    required this.eventId,
-    required this.type,
-    required this.price,
-    required this.totalQuantity,
-    required this.remainingQuantity,
-    this.highlights = const [],
-  });
-
-  bool get isSoldOut => remainingQuantity <= 0;
 }
 
 class Event {
@@ -121,6 +96,7 @@ final List<Event> mockEvents = [
         eventId: '1',
         type: 'General',
         price: 45.90,
+        maxPerOrder: 2,
         totalQuantity: 500,
         remainingQuantity: 120,
         highlights: ['Standing area access', 'Entry from 9:30 PM'],
@@ -130,6 +106,7 @@ final List<Event> mockEvents = [
         eventId: '1',
         type: 'VIP',
         price: 89.00,
+        maxPerOrder: 2,
         totalQuantity: 100,
         remainingQuantity: 12,
         highlights: [
@@ -146,31 +123,5 @@ final List<Event> mockEvents = [
       'Meet and greet available for VIP ticket holders',
       'Doors open one hour before showtime',
     ],
-  ),
-  Event(
-    id: '2',
-    title: 'Halloween Night',
-    description: 'A spooky night out.',
-    startsAt: DateTime(2026, 3, 22, 20, 0),
-    location: 'Bandung, Indonesia',
-    organizerId: 'org-2',
-    organizer: const User(
-      id: 'org-2',
-      email: 'hello@nightlife.co',
-      fullName: 'Nightlife Co.',
-      role: UserRole.organizer,
-    ),
-    tickets: const [
-      Ticket(
-        id: 't3',
-        eventId: '2',
-        type: 'General',
-        price: 30.00,
-        totalQuantity: 300,
-        remainingQuantity: 40,
-      ),
-    ],
-    imageUrl:
-        'https://images.unsplash.com/photo-1509557965875-b88c97052f0e?w=800',
   ),
 ];

@@ -1,5 +1,5 @@
 import 'package:event_hub_mobile/core/theme/app_theme.dart';
-import 'package:event_hub_mobile/features/events/data/models/event.dart';
+import 'package:event_hub_mobile/features/tickets/data/models/ticket.dart';
 import 'package:flutter/material.dart';
 
 class TicketOptionTile extends StatelessWidget {
