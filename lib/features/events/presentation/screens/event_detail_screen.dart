@@ -244,7 +244,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           // once that screen exists.
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.accent,
+                    backgroundColor: AppColors.accentStrong,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),

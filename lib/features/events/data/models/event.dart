@@ -24,6 +24,11 @@ class Ticket {
   final int totalQuantity;
   final int remainingQuantity;
 
+  // Frontend-only for now, like Event.highlights — short perks specific
+  // to this ticket type (e.g. VIP gets meet & greet, General doesn't).
+  // Wire this to a real backend field once one exists.
+  final List<String> highlights;
+
   const Ticket({
     required this.id,
     required this.eventId,
@@ -31,6 +36,7 @@ class Ticket {
     required this.price,
     required this.totalQuantity,
     required this.remainingQuantity,
+    this.highlights = const [],
   });
 
   bool get isSoldOut => remainingQuantity <= 0;
@@ -117,6 +123,7 @@ final List<Event> mockEvents = [
         price: 45.90,
         totalQuantity: 500,
         remainingQuantity: 120,
+        highlights: ['Standing area access', 'Entry from 9:30 PM'],
       ),
       Ticket(
         id: 't2',
@@ -125,6 +132,11 @@ final List<Event> mockEvents = [
         price: 89.00,
         totalQuantity: 100,
         remainingQuantity: 12,
+        highlights: [
+          'Meet and greet with Oliver Tree',
+          'Front-stage viewing area',
+          'Exclusive tour merchandise',
+        ],
       ),
     ],
     imageUrl:
