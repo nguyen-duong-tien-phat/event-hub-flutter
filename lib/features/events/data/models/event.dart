@@ -50,6 +50,11 @@ class Event {
   // field until the API provides a real image URL.
   final String imageUrl;
 
+  // Also frontend-only for now — short bullet points shown under the
+  // description (matches the reference design's checklist section).
+  // Wire this to a real backend field once one exists.
+  final List<String> highlights;
+
   const Event({
     required this.id,
     required this.title,
@@ -60,18 +65,28 @@ class Event {
     this.organizer,
     this.tickets = const [],
     required this.imageUrl,
+    this.highlights = const [],
   });
 
   // Derived display helpers — keeps formatting logic out of the widget.
   String get formattedDate => DateFormat('d MMM').format(startsAt);
   String get formattedTime => DateFormat('h:mm a').format(startsAt);
+  String get dayNumber => DateFormat('d').format(startsAt);
+  String get monthAbbreviated =>
+      DateFormat('MMM').format(startsAt).toUpperCase();
+  String get weekdayFull => DateFormat('EEEE').format(startsAt);
 
-  /// Lowest ticket price, formatted for display.
+  /// Ticket price display. Since an event can have multiple ticket
+  /// types at different prices, this shows a range ("From $X" when
+  /// there's one price, "$X - $Y" when there are several).
   /// Returns null if there are no tickets yet (e.g. not on sale).
   String? get formattedPrice {
     if (tickets.isEmpty) return null;
-    final lowest = tickets.map((t) => t.price).reduce((a, b) => a < b ? a : b);
-    return '\$${lowest.toStringAsFixed(2)}';
+    final prices = tickets.map((t) => t.price).toSet().toList()..sort();
+    if (prices.length == 1) {
+      return '\$${prices.first.toStringAsFixed(2)}';
+    }
+    return '\$${prices.first.toStringAsFixed(2)} - \$${prices.last.toStringAsFixed(2)}';
   }
 }
 
@@ -80,7 +95,11 @@ final List<Event> mockEvents = [
   Event(
     id: '1',
     title: 'Oliver Tree Concert',
-    description: 'Oliver Tree live in Jakarta.',
+    description:
+        'Oliver Tree brings his genre-bending live show to Jakarta for one night only. '
+        'Known for blending alternative rock, hip-hop, and electronic influences, expect '
+        'a high-energy set featuring fan favorites along with cuts from his latest album. '
+        'This is a standing venue — arrive early for the best spot near the stage.',
     startsAt: DateTime(2026, 12, 29, 22, 0),
     location: 'Jakarta, Indonesia',
     organizerId: 'org-1',
@@ -110,6 +129,11 @@ final List<Event> mockEvents = [
     ],
     imageUrl:
         'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800',
+    highlights: const [
+      'Oliver Tree performs live starting 10:00 PM',
+      'Meet and greet available for VIP ticket holders',
+      'Doors open one hour before showtime',
+    ],
   ),
   Event(
     id: '2',
