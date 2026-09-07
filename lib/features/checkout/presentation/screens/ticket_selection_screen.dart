@@ -1,8 +1,9 @@
+import 'package:event_hub_mobile/core/widgets/primary_button.dart';
+import 'package:event_hub_mobile/features/tickets/data/models/ticket.dart';
 import 'package:flutter/material.dart';
 import 'package:event_hub_mobile/core/theme/app_theme.dart';
 
 import '../../../events/data/models/event.dart';
-import '../../data/models/ticket.dart';
 import '../../data/models/ticket_selection_item.dart';
 import 'order_summary_screen.dart';
 
@@ -162,48 +163,31 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
               ],
             ),
             const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                onPressed: _totalTicketCount == 0
-                    ? null
-                    : () {
-                        final selections = event.tickets
-                            .where((t) => _quantityFor(t.id) > 0)
-                            .map(
-                              (t) => TicketSelectionItem(
-                                ticket: t,
-                                quantity: _quantityFor(t.id),
-                              ),
-                            )
-                            .toList();
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => OrderSummaryScreen(
-                              event: event,
-                              selections: selections,
+            PrimaryButton(
+              label: 'Continue',
+              onPressed: _totalTicketCount == 0
+                  ? null
+                  : () {
+                      final selections = event.tickets
+                          .where((t) => _quantityFor(t.id) > 0)
+                          .map(
+                            (t) => TicketSelectionItem(
+                              ticket: t,
+                              quantity: _quantityFor(t.id),
                             ),
+                          )
+                          .toList();
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrderSummaryScreen(
+                            event: event,
+                            selections: selections,
                           ),
-                        );
-                      },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accentStrong,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                child: const Text(
-                  'Continue',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
+                        ),
+                      );
+                    },
             ),
           ],
         ),

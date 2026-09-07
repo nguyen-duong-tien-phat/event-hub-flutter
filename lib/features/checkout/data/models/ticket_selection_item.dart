@@ -1,4 +1,4 @@
-import 'ticket.dart';
+import '../../../tickets/data/models/ticket.dart';
 
 class TicketSelectionItem {
   final Ticket ticket;

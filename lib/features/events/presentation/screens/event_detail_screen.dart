@@ -1,7 +1,7 @@
 import 'package:event_hub_mobile/core/theme/app_theme.dart';
+import 'package:event_hub_mobile/features/checkout/presentation/screens/ticket_selection_screen.dart';
 import 'package:event_hub_mobile/features/events/presentation/widgets/date_time.dart';
 import 'package:event_hub_mobile/features/events/presentation/widgets/ticket_option_tile.dart';
-import 'package:event_hub_mobile/features/tickets/presentations/screens/ticket_selection_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/models/event.dart';

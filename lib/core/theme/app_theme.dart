@@ -18,10 +18,10 @@ class AppColors {
 
 class AppTheme {
   static ThemeData get theme => ThemeData(
-    brightness: Brightness.dark,
+    brightness: Brightness.light,
     scaffoldBackgroundColor: AppColors.background,
     cardColor: AppColors.card,
-    colorScheme: const ColorScheme.dark(
+    colorScheme: const ColorScheme.light(
       primary: AppColors.accent,
       surface: AppColors.card,
     ),
