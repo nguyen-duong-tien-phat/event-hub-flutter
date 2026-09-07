@@ -56,6 +56,7 @@ class Event {
   String get monthAbbreviated =>
       DateFormat('MMM').format(startsAt).toUpperCase();
   String get weekdayFull => DateFormat('EEEE').format(startsAt);
+  String get fullDate => DateFormat('MMMM d, y').format(startsAt);
 
   /// Ticket price display. Since an event can have multiple ticket
   /// types at different prices, this shows a range ("From $X" when
@@ -104,7 +105,7 @@ final List<Event> mockEvents = [
       Ticket(
         id: 't2',
         eventId: '1',
-        type: 'VIP',
+        type: 'Premium',
         price: 89.00,
         maxPerOrder: 2,
         totalQuantity: 100,

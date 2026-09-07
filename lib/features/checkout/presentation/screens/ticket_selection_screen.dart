@@ -1,3 +1,4 @@
+import 'package:event_hub_mobile/core/widgets/card.dart';
 import 'package:event_hub_mobile/core/widgets/primary_button.dart';
 import 'package:event_hub_mobile/features/tickets/data/models/ticket.dart';
 import 'package:flutter/material.dart';
@@ -53,70 +54,6 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          // --- Event header, now a proper card instead of bare text ---
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.card,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: AppColors.accent.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.event,
-                    color: AppColors.accent,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        event.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        '${event.formattedDate} · ${event.formattedTime}',
-                        style: const TextStyle(
-                          color: AppColors.textMuted,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          const Text(
-            'Choose your tickets',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w700,
-              fontSize: 15,
-            ),
-          ),
-          const SizedBox(height: 12),
-
           ...event.tickets.map(
             (ticket) => Padding(
               padding: const EdgeInsets.only(bottom: 14),
@@ -214,131 +151,121 @@ class _TicketSelectorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-      opacity: ticket.isSoldOut ? 0.5 : 1,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.card,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: quantity > 0 ? AppColors.accent : AppColors.border,
-            width: quantity > 0 ? 1.5 : 1,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // --- Section 1: type + price ---
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    ticket.type,
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                Text(
-                  '\$${ticket.price.toStringAsFixed(2)}',
+    return AppCard(
+      disabled: ticket.isSoldOut,
+      bordered: quantity > 0,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // --- Section 1: type + price ---
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  ticket.type,
                   style: const TextStyle(
-                    color: AppColors.gold,
-                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w700,
                     fontSize: 16,
                   ),
                 ),
-              ],
-            ),
-
-            // --- Section 2: highlights ---
-            if (ticket.highlights.isNotEmpty) ...[
-              const SizedBox(height: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: ticket.highlights
-                    .map(
-                      (point) => Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Icon(
-                              Icons.check,
-                              size: 14,
-                              color: AppColors.accent,
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                point,
-                                style: const TextStyle(
-                                  color: AppColors.textMuted,
-                                  fontSize: 12.5,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                    .toList(),
+              ),
+              Text(
+                '\$${ticket.price.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  color: AppColors.gold,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 16,
+                ),
               ),
             ],
+          ),
 
-            const SizedBox(height: 14),
-            const Divider(color: AppColors.border, height: 1),
-            const SizedBox(height: 14),
-
-            // --- Section 3: quantity, on its own labeled row ---
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (ticket.isSoldOut)
-                  const Text(
-                    'Sold out',
-                    style: TextStyle(
-                      color: Colors.redAccent,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
+          // --- Section 2: highlights ---
+          if (ticket.highlights.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: ticket.highlights
+                  .map(
+                    (point) => Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(
+                            Icons.check,
+                            size: 14,
+                            color: AppColors.accent,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              point,
+                              style: const TextStyle(
+                                color: AppColors.textMuted,
+                                fontSize: 12.5,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   )
-                else
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${ticket.remainingQuantity} available',
-                        style: const TextStyle(
-                          color: AppColors.textMuted,
-                          fontSize: 13,
-                        ),
-                      ),
-                      Text(
-                        // Set by the organizer per ticket type — not a
-                        // hardcoded app-wide rule.
-                        'Max ${ticket.maxPerOrder} per order',
-                        style: const TextStyle(
-                          color: AppColors.textMuted,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
-                  ),
-                if (!ticket.isSoldOut)
-                  _QuantityStepper(
-                    quantity: quantity,
-                    maxQuantity: ticket.effectiveMaxQuantity,
-                    onChanged: onChanged,
-                  ),
-              ],
+                  .toList(),
             ),
           ],
-        ),
+
+          const SizedBox(height: 14),
+          const Divider(color: AppColors.border, height: 1),
+          const SizedBox(height: 14),
+
+          // --- Section 3: quantity, on its own labeled row ---
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (ticket.isSoldOut)
+                const Text(
+                  'Sold out',
+                  style: TextStyle(
+                    color: Colors.redAccent,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
+                )
+              else
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${ticket.remainingQuantity} available',
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 13,
+                      ),
+                    ),
+                    Text(
+                      // Set by the organizer per ticket type — not a
+                      // hardcoded app-wide rule.
+                      'Max ${ticket.maxPerOrder} per order',
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              if (!ticket.isSoldOut)
+                _QuantityStepper(
+                  quantity: quantity,
+                  maxQuantity: ticket.effectiveMaxQuantity,
+                  onChanged: onChanged,
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }
