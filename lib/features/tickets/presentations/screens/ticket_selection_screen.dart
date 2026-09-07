@@ -154,7 +154,7 @@ class _TicketSelectionScreenState extends State<TicketSelectionScreen> {
                 Text(
                   '\$${_totalPrice.toStringAsFixed(2)}',
                   style: const TextStyle(
-                    color: AppColors.accent,
+                    color: AppColors.gold,
                     fontSize: 19,
                     fontWeight: FontWeight.w800,
                   ),
@@ -262,7 +262,7 @@ class _TicketSelectorCard extends StatelessWidget {
                 Text(
                   '\$${ticket.price.toStringAsFixed(2)}',
                   style: const TextStyle(
-                    color: AppColors.accent,
+                    color: AppColors.gold,
                     fontWeight: FontWeight.w800,
                     fontSize: 16,
                   ),

@@ -9,7 +9,7 @@ class EventHubApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Event Hub',
-      theme: AppTheme.dark,
+      theme: AppTheme.theme,
       debugShowCheckedModeBanner: false,
       home: const EventListScreen(),
     );

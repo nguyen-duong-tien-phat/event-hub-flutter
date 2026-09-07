@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const background = Color(0xFF1C1712);
-  static const card = Color(0xFF2A2420);
-  static const border = Color(0xFF3C332C);
-  static const textPrimary = Color(0xFFF5F1EA);
-  static const textMuted = Color(0xFFA89E92);
+  static const background = Color(0xFFF7F7F5);
+  static const card = Color(0xFFFFFFFF);
+  static const border = Color(0xFFE7E7E3);
 
-  // Warm tan — text/icon color for anything sitting directly on a
-  // dark background or card (pin icon, price text, cursor, etc.).
-  static const accent = Color(0xFFE0A672);
+  static const textPrimary = Color(0xFF17191C);
+  static const textMuted = Color(0xFF73777D);
 
-  // Dark brown — used only as a SOLID fill behind white text or
-  // dark text on a light chip (buttons, selected pill background).
-  // Do not use as text color on a dark surface — too low contrast.
-  static const accentStrong = Color(0xFF5C3A28);
+  // Vibrant event accent
+  static const accent = Color(0xFF7C3AED);
+  static const accentStrong = Color(0xFF6D28D9);
+
+  static const pink = Color(0xFFEC4899);
+  static const gold = Color(0xFFF59E0B);
 }
 
 class AppTheme {
-  static ThemeData get dark => ThemeData(
+  static ThemeData get theme => ThemeData(
     brightness: Brightness.dark,
     scaffoldBackgroundColor: AppColors.background,
     cardColor: AppColors.card,

@@ -1,8 +1,8 @@
+import 'package:event_hub_mobile/core/theme/app_theme.dart';
 import 'package:event_hub_mobile/features/events/presentation/widgets/date_time.dart';
 import 'package:event_hub_mobile/features/events/presentation/widgets/ticket_option_tile.dart';
 import 'package:event_hub_mobile/features/tickets/presentations/screens/ticket_selection_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:event_hub_mobile/core/theme/app_theme.dart';
 
 import '../../data/models/event.dart';
 
@@ -31,7 +31,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             pinned: true,
             backgroundColor: AppColors.background,
             leading: _CircleIconButton(
-              icon: Icons.arrow_back,
+              icon: Icons.arrow_back_ios_new,
               onTap: () => Navigator.pop(context),
             ),
             actions: [
@@ -41,23 +41,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,
-                children: [
-                  Image.network(event.imageUrl, fit: BoxFit.cover),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        stops: const [0.0, 0.5, 1.0],
-                        colors: [
-                          Colors.transparent,
-                          AppColors.background.withOpacity(0.55),
-                          AppColors.background,
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                children: [Image.network(event.imageUrl, fit: BoxFit.cover)],
               ),
             ),
           ),
@@ -103,7 +87,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           child: Text(
                             event.formattedPrice!,
                             style: const TextStyle(
-                              color: AppColors.accent,
+                              color: AppColors.gold,
                               fontSize: 17,
                               fontWeight: FontWeight.w800,
                             ),
@@ -143,7 +127,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             const Icon(
                               Icons.check_circle,
                               size: 18,
-                              color: AppColors.accent,
+                              color: Colors.green,
                             ),
                             const SizedBox(width: 8),
                             Expanded(
@@ -286,7 +270,7 @@ class _CircleIconButton extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: CircleAvatar(
-          backgroundColor: Colors.black.withOpacity(0.4),
+          backgroundColor: Colors.black.withOpacity(0.6),
           child: Icon(icon, color: Colors.white, size: 18),
         ),
       ),

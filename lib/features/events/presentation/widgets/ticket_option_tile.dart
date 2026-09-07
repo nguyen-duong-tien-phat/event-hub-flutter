@@ -2,6 +2,16 @@ import 'package:event_hub_mobile/core/theme/app_theme.dart';
 import 'package:event_hub_mobile/features/tickets/data/models/ticket.dart';
 import 'package:flutter/material.dart';
 
+// Cool blue accent used only within this tile — kept local rather
+// than added to AppColors, since it's not a theme-wide color choice.
+// Chosen specifically because it contrasts against the warm
+// tan/brown used everywhere else, so this badge/price actually
+// stands out instead of blending into the card.
+const _ticketAccent = Color(0xFF4C8FE0);
+
+// Gold — used specifically for price text, to make it stand out as
+// its own distinct signal separate from the ticket type's blue accent.
+
 class TicketOptionTile extends StatelessWidget {
   final Ticket ticket;
 
@@ -21,26 +31,26 @@ class TicketOptionTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           color: AppColors.card,
           border: Border.all(
-            color: isLowStock
-                ? AppColors.accent.withOpacity(0.5)
-                : AppColors.border,
+            color: isLowStock ? AppColors.accentStrong : AppColors.border,
           ),
         ),
         child: Column(
           children: [
             Row(
               children: [
-                // Icon badge
+                // Icon badge — bumped opacity + switched hue so it
+                // actually registers against the card instead of
+                // disappearing into it.
                 Container(
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withOpacity(0.15),
+                    color: _ticketAccent.withOpacity(0.22),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
                     Icons.confirmation_number_outlined,
-                    color: AppColors.accent,
+                    color: _ticketAccent,
                     size: 20,
                   ),
                 ),
@@ -69,7 +79,7 @@ class TicketOptionTile extends StatelessWidget {
                           color: ticket.isSoldOut
                               ? Colors.redAccent
                               : isLowStock
-                              ? AppColors.accent
+                              ? Colors.orangeAccent
                               : AppColors.textMuted,
                           fontSize: 12,
                           fontWeight: isLowStock
@@ -85,15 +95,15 @@ class TicketOptionTile extends StatelessWidget {
                 Text(
                   '\$${ticket.price.toStringAsFixed(2)}',
                   style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w700,
+                    color: AppColors.gold,
+                    fontWeight: FontWeight.w800,
                     fontSize: 16,
                   ),
                 ),
               ],
             ),
 
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
 
             if (ticket.highlights.isNotEmpty) ...[
               const SizedBox(height: 6),
@@ -103,11 +113,7 @@ class TicketOptionTile extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(
-                        Icons.check,
-                        size: 13,
-                        color: AppColors.accent,
-                      ),
+                      const Icon(Icons.check, size: 13, color: Colors.green),
                       const SizedBox(width: 5),
                       Expanded(
                         child: Text(

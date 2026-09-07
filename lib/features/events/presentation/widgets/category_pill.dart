@@ -39,17 +39,13 @@ class CategoryPill extends StatelessWidget {
                 Icon(
                   icon,
                   size: 16,
-                  color: isSelected
-                      ? AppColors.textPrimary
-                      : AppColors.accentStrong,
+                  color: isSelected ? Colors.white : AppColors.accentStrong,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   label,
                   style: TextStyle(
-                    color: isSelected
-                        ? AppColors.textPrimary
-                        : AppColors.accentStrong,
+                    color: isSelected ? Colors.white : AppColors.accentStrong,
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
                   ),

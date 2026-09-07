@@ -116,8 +116,7 @@ final List<Event> mockEvents = [
         ],
       ),
     ],
-    imageUrl:
-        'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800',
+    imageUrl: 'https://static.vecteezy.com/system/resources/thumbnails/041/388/388/small/ai-generated-concert-crowd-enjoying-live-music-event-photo.jpg',
     highlights: const [
       'Oliver Tree performs live starting 10:00 PM',
       'Meet and greet available for VIP ticket holders',
