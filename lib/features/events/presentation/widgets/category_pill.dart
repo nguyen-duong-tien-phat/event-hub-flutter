@@ -30,7 +30,7 @@ class CategoryPill extends StatelessWidget {
             decoration: BoxDecoration(
               color: isSelected
                   ? AppColors.accentStrong
-                  : Colors.white.withOpacity(0.5),
+                  : Colors.white.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(

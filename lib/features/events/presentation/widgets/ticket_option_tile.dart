@@ -38,7 +38,7 @@ class TicketOptionTile extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: _ticketAccent.withOpacity(0.22),
+                  color: _ticketAccent.withValues(alpha: 0.22),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(

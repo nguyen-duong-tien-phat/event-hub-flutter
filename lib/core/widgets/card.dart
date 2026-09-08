@@ -31,7 +31,7 @@ class AppCard extends StatelessWidget {
             BoxShadow(
               color: bordered
                   ? AppColors.accent.withValues(alpha: 0.1)
-                  : Colors.black.withOpacity(0.08),
+                  : Colors.black.withValues(alpha: 0.08),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
