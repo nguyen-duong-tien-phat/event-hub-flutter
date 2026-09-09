@@ -1,21 +1,6 @@
+import 'package:event_hub_mobile/features/auth/data/models/user.dart';
 import 'package:event_hub_mobile/features/tickets/data/models/ticket.dart';
 import 'package:intl/intl.dart';
-
-enum UserRole { admin, attendee, organizer }
-
-class User {
-  final String id;
-  final String email;
-  final String fullName;
-  final UserRole role;
-
-  const User({
-    required this.id,
-    required this.email,
-    required this.fullName,
-    required this.role,
-  });
-}
 
 class Event {
   final String id; // Guid -> String on the Dart side

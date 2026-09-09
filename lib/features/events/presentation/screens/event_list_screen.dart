@@ -1,8 +1,10 @@
 import 'package:event_hub_mobile/core/theme/app_theme.dart';
+import 'package:event_hub_mobile/features/auth/presentations/provider/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:provider/provider.dart';
 
 import '../../data/models/category.dart';
 import '../../data/models/event.dart';
@@ -32,13 +34,16 @@ class _EventListScreenState extends State<EventListScreen> {
 
   Future<void> _getCurrentLocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
+
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
+
       if (permission == LocationPermission.denied) {
         setState(() => _permissionDenied = true);
         return;
       }
     }
+
     if (permission == LocationPermission.deniedForever) {
       setState(() => _permissionDenied = true);
       return;
@@ -46,17 +51,20 @@ class _EventListScreenState extends State<EventListScreen> {
 
     final position = await Geolocator.getCurrentPosition();
 
-    // geocoding v5.0.0 uses an instance-based API: create a Geocoding()
-    // instance and call methods on it (not a top-level function).
     final placemarks = await _geocoding.placemarkFromCoordinates(
       position.latitude,
       position.longitude,
     );
+
     final place = placemarks.first;
 
     setState(() {
       _locationText = '${place.locality}, ${place.isoCountryCode}';
     });
+  }
+
+  Future<void> _logout() async {
+    await context.read<AuthProvider>().logout();
   }
 
   @override
@@ -68,37 +76,55 @@ class _EventListScreenState extends State<EventListScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 12),
+              // --- Header ---
+              Row(
+                children: [
+                  const Spacer(),
 
-              // --- Location ---
-              if (!_permissionDenied)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      LucideIcons.mapPin,
-                      color: AppColors.accent,
-                      size: 18,
+                  // Location
+                  if (!_permissionDenied)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          LucideIcons.mapPin,
+                          color: AppColors.accent,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 4),
+                        _locationText == null
+                            ? const SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.accent,
+                                ),
+                              )
+                            : Text(
+                                _locationText!,
+                                style: const TextStyle(
+                                  color: AppColors.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                      ],
                     ),
-                    const SizedBox(width: 4),
-                    _locationText == null
-                        ? const SizedBox(
-                            width: 14,
-                            height: 14,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.accent,
-                            ),
-                          )
-                        : Text(
-                            _locationText!,
-                            style: const TextStyle(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                  ],
-                ),
+
+                  const Spacer(),
+
+                  // Logout
+                  IconButton(
+                    onPressed: _logout,
+                    icon: const Icon(
+                      LucideIcons.logOut,
+                      color: AppColors.textPrimary,
+                      size: 20,
+                    ),
+                    tooltip: 'Logout',
+                  ),
+                ],
+              ),
 
               const SizedBox(height: 20),
 
@@ -134,6 +160,7 @@ class _EventListScreenState extends State<EventListScreen> {
                   itemCount: mockEvents.length,
                   itemBuilder: (context, index) {
                     final event = mockEvents[index];
+
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: EventCard(
