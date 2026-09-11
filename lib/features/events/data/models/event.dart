@@ -8,17 +8,9 @@ class Event {
   final String description;
   final DateTime startsAt;
   final String location;
-  final String organizerId;
   final User? organizer;
   final List<Ticket> tickets;
-
-  // Not part of the backend entity yet — kept as a frontend-only
-  // field until the API provides a real image URL.
   final String imageUrl;
-
-  // Also frontend-only for now — short bullet points shown under the
-  // description (matches the reference design's checklist section).
-  // Wire this to a real backend field once one exists.
   final List<String> highlights;
 
   const Event({
@@ -27,12 +19,32 @@ class Event {
     required this.description,
     required this.startsAt,
     required this.location,
-    required this.organizerId,
     this.organizer,
     this.tickets = const [],
     required this.imageUrl,
     this.highlights = const [],
   });
+
+  factory Event.fromJson(Map<String, dynamic> json) {
+    return Event(
+      id: json['id'],
+      title: json['title'],
+      description: json['description'],
+      startsAt: DateTime.parse(json['startsAt'] as String),
+      location: json['location'],
+      organizer: json['organizer'] == null
+          ? null
+          : User.fromJson(json['organizer']),
+      imageUrl: json['imageUrl'],
+      highlights: (json['highlights'] as List<dynamic>? ?? [])
+          .map((item) => item as String)
+          .toList(),
+
+      tickets: (json['tickets'] as List<dynamic>? ?? [])
+          .map((ticket) => Ticket.fromJson(ticket as Map<String, dynamic>))
+          .toList(),
+    );
+  }
 
   // Derived display helpers — keeps formatting logic out of the widget.
   String get formattedDate => DateFormat('d MMM').format(startsAt);
@@ -56,57 +68,3 @@ class Event {
     return '\$${prices.first.toStringAsFixed(2)} - \$${prices.last.toStringAsFixed(2)}';
   }
 }
-
-// Mock data for now — replace with a real API/repository call later.
-final List<Event> mockEvents = [
-  Event(
-    id: '1',
-    title: 'Oliver Tree Concert',
-    description:
-        'Oliver Tree brings his genre-bending live show to Jakarta for one night only. '
-        'Known for blending alternative rock, hip-hop, and electronic influences, expect '
-        'a high-energy set featuring fan favorites along with cuts from his latest album. '
-        'This is a standing venue — arrive early for the best spot near the stage.',
-    startsAt: DateTime(2026, 12, 29, 22, 0),
-    location: 'Jakarta, Indonesia',
-    organizerId: 'org-1',
-    organizer: const User(
-      id: 'org-1',
-      email: 'contact@livenation.id',
-      fullName: 'Live Nation Indonesia',
-      role: UserRole.organizer,
-    ),
-    tickets: const [
-      Ticket(
-        id: 't1',
-        eventId: '1',
-        type: 'General',
-        price: 45.90,
-        maxPerOrder: 2,
-        totalQuantity: 500,
-        remainingQuantity: 120,
-        highlights: ['Standing area access', 'Entry from 9:30 PM'],
-      ),
-      Ticket(
-        id: 't2',
-        eventId: '1',
-        type: 'Premium',
-        price: 89.00,
-        maxPerOrder: 2,
-        totalQuantity: 100,
-        remainingQuantity: 12,
-        highlights: [
-          'Meet and greet with Oliver Tree',
-          'Front-stage viewing area',
-          'Exclusive tour merchandise',
-        ],
-      ),
-    ],
-    imageUrl: 'https://static.vecteezy.com/system/resources/thumbnails/041/388/388/small/ai-generated-concert-crowd-enjoying-live-music-event-photo.jpg',
-    highlights: const [
-      'Oliver Tree performs live starting 10:00 PM',
-      'Meet and greet available for VIP ticket holders',
-      'Doors open one hour before showtime',
-    ],
-  ),
-];

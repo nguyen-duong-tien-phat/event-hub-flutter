@@ -1,5 +1,6 @@
 import 'package:event_hub_mobile/core/theme/app_theme.dart';
 import 'package:event_hub_mobile/features/auth/presentations/provider/auth_provider.dart';
+import 'package:event_hub_mobile/features/events/data/repositories/event_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
@@ -22,14 +23,38 @@ class EventListScreen extends StatefulWidget {
 }
 
 class _EventListScreenState extends State<EventListScreen> {
+  final EventRepository _eventRepository = EventRepository();
+
   String? _locationText;
   bool _permissionDenied = false;
   String _selectedKey = 'my_feed';
+  List<Event> _events = [];
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
+    _fetchEvents();
+  }
+
+  Future<void> _fetchEvents() async {
+    try {
+      final events = await _eventRepository.getEvents(page: 1, size: 10);
+
+      if (!mounted) return;
+
+      setState(() {
+        _events = events;
+        // _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      // setState(() {
+      //   _error = e.toString();
+      //   _isLoading = false;
+      // });
+    }
   }
 
   Future<void> _getCurrentLocation() async {
@@ -157,9 +182,9 @@ class _EventListScreenState extends State<EventListScreen> {
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.only(bottom: 16),
-                  itemCount: mockEvents.length,
+                  itemCount: _events.length,
                   itemBuilder: (context, index) {
-                    final event = mockEvents[index];
+                    final event = _events[index];
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16),

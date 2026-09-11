@@ -28,6 +28,18 @@ class Ticket {
     required this.maxPerOrder,
   });
 
+  factory Ticket.fromJson(Map<String, dynamic> json) {
+    return Ticket(
+      id: json['id'],
+      eventId: json['eventId'],
+      type: json['type'],
+      price: json['price'],
+      totalQuantity: json['totalQuantity'],
+      remainingQuantity: json['remainingQuantity'],
+      maxPerOrder: json['maxPerOrder'] ?? 2,
+    );
+  }
+
   bool get isSoldOut => remainingQuantity <= 0;
 
   /// The actual max a person can select right now — whichever is

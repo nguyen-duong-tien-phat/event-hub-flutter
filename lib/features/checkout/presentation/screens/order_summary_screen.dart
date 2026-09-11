@@ -2,8 +2,10 @@ import 'package:event_hub_mobile/core/theme/app_theme.dart';
 import 'package:event_hub_mobile/core/widgets/card.dart';
 import 'package:event_hub_mobile/core/widgets/divider.dart';
 import 'package:event_hub_mobile/core/widgets/primary_button.dart';
+import 'package:event_hub_mobile/features/auth/presentations/provider/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:provider/provider.dart';
 
 import '../../../events/data/models/event.dart';
 import '../../data/models/ticket_selection_item.dart';
@@ -27,6 +29,8 @@ class OrderSummaryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<AuthProvider>().user;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -102,7 +106,7 @@ class OrderSummaryScreen extends StatelessWidget {
 
           const SizedBox(height: 5),
 
-          const AppCard(
+          AppCard(
             child: Row(
               children: [
                 Icon(LucideIcons.user, size: 24, color: AppColors.accent),
@@ -112,7 +116,7 @@ class OrderSummaryScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Nguyen Duong Tien Phat',
+                        user?.fullName ?? '',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -123,7 +127,7 @@ class OrderSummaryScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 3),
                       Text(
-                        'finn@example.com',
+                        user?.email ?? '',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
