@@ -1,5 +1,8 @@
 import 'package:event_hub_mobile/core/theme/app_theme.dart';
+import 'package:event_hub_mobile/core/widgets/snack_bar.dart';
+import 'package:event_hub_mobile/features/auth/presentations/screens/splash_screen.dart';
 import 'package:event_hub_mobile/features/checkout/presentation/screens/ticket_selection_screen.dart';
+import 'package:event_hub_mobile/features/events/data/repositories/event_repository.dart';
 import 'package:event_hub_mobile/features/events/presentation/widgets/date_time.dart';
 import 'package:event_hub_mobile/features/events/presentation/widgets/ticket_option_tile.dart';
 import 'package:flutter/material.dart';
@@ -7,20 +10,42 @@ import 'package:flutter/material.dart';
 import '../../data/models/event.dart';
 
 class EventDetailScreen extends StatefulWidget {
-  final Event event;
+  final String id;
 
-  const EventDetailScreen({super.key, required this.event});
+  const EventDetailScreen({super.key, required this.id});
 
   @override
   State<EventDetailScreen> createState() => _EventDetailScreenState();
 }
 
 class _EventDetailScreenState extends State<EventDetailScreen> {
+  final EventRepository eventRepository = EventRepository();
+
   bool _isSaved = false;
+  bool _isFetching = true;
+  Event? _event;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchEventDetail();
+  }
+
+  Future<void> _fetchEventDetail() async {
+    try {
+      final eventDetail = await eventRepository.getEventDetail(widget.id);
+      setState(() => _event = eventDetail);
+    } catch (e) {
+      showErrorSnackBar(context, e.toString());
+    } finally {
+      setState(() => _isFetching = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final event = widget.event;
+    if (_isFetching) return SplashScreen();
+    if (_event == null) return Text('Event Not Found!');
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -41,7 +66,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,
-                children: [Image.network(event.imageUrl, fit: BoxFit.cover)],
+                children: [Image.network(_event!.imageUrl, fit: BoxFit.cover)],
               ),
             ),
           ),
@@ -53,7 +78,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    event.title,
+                    _event!.title,
                     style: const TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 22,
@@ -61,7 +86,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ),
                   ),
                   Text(
-                    event.location,
+                    _event!.location,
                     style: const TextStyle(
                       color: AppColors.textMuted,
                       fontSize: 14,
@@ -71,8 +96,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   const SizedBox(height: 18),
                   Row(
                     children: [
-                      Expanded(child: DateTimeWidget(event: event)),
-                      if (event.formattedPrice != null) ...[
+                      Expanded(child: DateTimeWidget(event: _event!)),
+                      if (_event!.formattedPrice != null) ...[
                         const SizedBox(width: 16),
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -85,7 +110,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             border: Border.all(color: AppColors.border),
                           ),
                           child: Text(
-                            event.formattedPrice!,
+                            _event!.formattedPrice!,
                             style: const TextStyle(
                               color: AppColors.gold,
                               fontSize: 17,
@@ -108,7 +133,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    event.description,
+                    _event!.description,
                     style: const TextStyle(
                       color: AppColors.textMuted,
                       fontSize: 14,
@@ -116,9 +141,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ),
                   ),
 
-                  if (event.highlights.isNotEmpty) ...[
+                  if (_event!.highlights.isNotEmpty) ...[
                     const SizedBox(height: 20),
-                    ...event.highlights.map(
+                    ..._event!.highlights.map(
                       (point) => Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: Row(
@@ -146,7 +171,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ),
                   ],
 
-                  if (event.tickets.isNotEmpty) ...[
+                  if (_event!.tickets.isNotEmpty) ...[
                     const SizedBox(height: 26),
                     const Text(
                       'Ticket options',
@@ -157,7 +182,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    ...event.tickets.map(
+                    ..._event!.tickets.map(
                       (ticket) => Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: TicketOptionTile(ticket: ticket),
@@ -165,7 +190,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ),
                   ],
 
-                  if (event.organizer != null) ...[
+                  if (_event!.organizer != null) ...[
                     const SizedBox(height: 24),
                     const Text(
                       'Organizer',
@@ -177,7 +202,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      event.organizer!.fullName,
+                      _event!.organizer!.fullName,
                       style: const TextStyle(
                         color: AppColors.textMuted,
                         fontSize: 14,
@@ -222,14 +247,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               child: SizedBox(
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: event.tickets.isEmpty
+                  onPressed: _event!.tickets.isEmpty
                       ? null
                       : () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  TicketSelectionScreen(event: event),
+                                  TicketSelectionScreen(event: _event!),
                             ),
                           );
                         },
@@ -240,7 +265,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ),
                   ),
                   child: Text(
-                    event.tickets.isEmpty ? 'Sold Out' : 'Get a Ticket',
+                    _event!.tickets.isEmpty ? 'Sold Out' : 'Get a Ticket',
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,

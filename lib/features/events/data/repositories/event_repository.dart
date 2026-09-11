@@ -1,16 +1,12 @@
-import 'package:event_hub_mobile/core/network/api_client.dart';
+import 'package:event_hub_mobile/core/network/base_repository.dart';
 import 'package:event_hub_mobile/features/events/data/models/event.dart';
-import 'package:flutter/material.dart';
 
-class EventRepository {
-  final ApiClient _apiClient;
-
-  EventRepository({ApiClient? apiClient})
-    : _apiClient = apiClient ?? ApiClient();
+class EventRepository extends BaseRepository {
+  EventRepository({super.apiClient});
 
   Future<List<Event>> getEvents({int page = 1, int size = 10}) async {
-    try {
-      final response = await _apiClient.dio.get(
+    return handleRequest(() async {
+      final response = await apiClient.dio.get(
         '/events',
         queryParameters: {'page': page, 'pageSize': size},
       );
@@ -20,9 +16,13 @@ class EventRepository {
       return items
           .map((json) => Event.fromJson(json as Map<String, dynamic>))
           .toList();
-    } catch (e) {
-      debugPrint('Failed to fetch events: $e');
-      rethrow; // Important: don't hide the error
-    }
+    });
+  }
+
+  Future<Event> getEventDetail(String id) {
+    return handleRequest(() async {
+      final response = await apiClient.dio.get('events/$id');
+      return Event.fromJson(response.data);
+    });
   }
 }

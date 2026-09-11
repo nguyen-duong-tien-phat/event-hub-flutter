@@ -1,7 +1,6 @@
 import 'package:event_hub_mobile/core/theme/app_theme.dart';
 import 'package:event_hub_mobile/core/widgets/snack_bar.dart';
 import 'package:event_hub_mobile/core/widgets/text_field.dart';
-import 'package:event_hub_mobile/features/auth/data/repositories/auth_repository.dart';
 import 'package:event_hub_mobile/features/auth/presentations/provider/auth_provider.dart';
 import 'package:event_hub_mobile/features/events/presentation/screens/event_list_screen.dart';
 import 'package:flutter/material.dart';
@@ -51,9 +50,9 @@ class _LoginScreenState extends State<LoginScreen> {
         context,
         MaterialPageRoute(builder: (_) => const EventListScreen()),
       );
-    } on AuthException catch (e) {
+    } catch (e) {
       if (!mounted) return;
-      showErrorSnackBar(context, e.message);
+      showErrorSnackBar(context, e.toString());
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

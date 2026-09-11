@@ -1,3 +1,4 @@
+import 'package:event_hub_mobile/core/widgets/snack_bar.dart';
 import 'package:event_hub_mobile/features/auth/presentations/provider/auth_provider.dart';
 import 'package:event_hub_mobile/features/auth/presentations/screens/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -40,19 +41,23 @@ class _SignupScreenState extends State<SignupScreen> {
 
     setState(() => _isLoading = true);
 
-    await context.read<AuthProvider>().register(
-      email: _emailController.text.trim(),
-      password: _passwordController.text.trim(),
-      fullName: _nameController.text.trim(),
-    );
+    try {
+      await context.read<AuthProvider>().register(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        fullName: _nameController.text.trim(),
+      );
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() => _isLoading = false);
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-    );
+      setState(() => _isLoading = false);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+    } catch (e) {
+      showErrorSnackBar(context, e.toString());
+    }
   }
 
   @override
