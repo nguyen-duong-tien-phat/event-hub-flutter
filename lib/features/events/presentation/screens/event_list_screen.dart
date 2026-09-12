@@ -33,8 +33,15 @@ class _EventListScreenState extends State<EventListScreen> {
   @override
   void initState() {
     super.initState();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    await _fetchEvents();
+
+    if (!mounted) return;
+
     _getCurrentLocation();
-    _fetchEvents();
   }
 
   Future<void> _fetchEvents() async {
@@ -58,10 +65,14 @@ class _EventListScreenState extends State<EventListScreen> {
   }
 
   Future<void> _getCurrentLocation() async {
-    LocationPermission permission = await Geolocator.checkPermission();
+    var permission = await Geolocator.checkPermission();
+
+    if (!mounted) return;
 
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
+
+      if (!mounted) return;
 
       if (permission == LocationPermission.denied) {
         setState(() => _permissionDenied = true);
@@ -76,16 +87,20 @@ class _EventListScreenState extends State<EventListScreen> {
 
     final position = await Geolocator.getCurrentPosition();
 
+    if (!mounted) return;
+
     final placemarks = await _geocoding.placemarkFromCoordinates(
       position.latitude,
       position.longitude,
     );
 
+    if (!mounted) return;
+
     final place = placemarks.first;
 
-    setState(() {
-      _locationText = '${place.locality}, ${place.isoCountryCode}';
-    });
+    setState(
+      () => _locationText = '${place.locality}, ${place.isoCountryCode}',
+    );
   }
 
   Future<void> _logout() async {

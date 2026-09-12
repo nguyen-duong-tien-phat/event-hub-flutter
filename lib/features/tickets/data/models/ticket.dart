@@ -5,16 +5,7 @@ class Ticket {
   final double price;
   final int totalQuantity;
   final int remainingQuantity;
-
-  // Frontend-only for now, like Event.highlights — short perks specific
-  // to this ticket type (e.g. VIP gets meet & greet, General doesn't).
-  // Wire this to a real backend field once one exists.
   final List<String> highlights;
-
-  // A per-order purchase cap, independent of remaining stock (e.g.
-  // "max 4 per order" even if 200 are still available) — common
-  // anti-scalping rule on real ticketing platforms. Frontend-only for
-  // now; wire to a backend field once one exists.
   final int maxPerOrder;
 
   const Ticket({
@@ -37,6 +28,9 @@ class Ticket {
       totalQuantity: json['totalQuantity'],
       remainingQuantity: json['remainingQuantity'],
       maxPerOrder: json['maxPerOrder'] ?? 2,
+      highlights: (json['highlights'] as List<dynamic>? ?? [])
+          .map((item) => item as String)
+          .toList(),
     );
   }
 
