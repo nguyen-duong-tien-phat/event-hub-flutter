@@ -3,29 +3,84 @@ import 'package:event_hub_mobile/core/widgets/card.dart';
 import 'package:event_hub_mobile/core/widgets/divider.dart';
 import 'package:event_hub_mobile/core/widgets/primary_button.dart';
 import 'package:event_hub_mobile/features/auth/presentations/provider/auth_provider.dart';
+import 'package:event_hub_mobile/features/checkout/data/models/booking_ticket.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
 import '../../../events/data/models/event.dart';
 import '../../data/models/ticket_selection_item.dart';
+import '../../data/repositories/booking_repository.dart';
 
-class OrderSummaryScreen extends StatelessWidget {
+class OrderSummaryScreen extends StatefulWidget {
   final Event event;
   final List<TicketSelectionItem> selections;
+  final BookingRepository bookingRepository;
 
-  const OrderSummaryScreen({
+  OrderSummaryScreen({
     super.key,
     required this.event,
     required this.selections,
-  });
+    BookingRepository? bookingRepository,
+  }) : bookingRepository = bookingRepository ?? BookingRepository();
+
+  @override
+  State<OrderSummaryScreen> createState() => _OrderSummaryScreenState();
+}
+
+class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
+  bool _isBooking = false;
 
   double get _subtotal =>
-      selections.fold(0, (sum, item) => sum + item.subtotal);
+      widget.selections.fold(0, (sum, item) => sum + item.subtotal);
 
   double get _serviceFee => _subtotal * 0.02;
 
   double get _total => _subtotal + _serviceFee;
+
+  Future<void> _continueToPayment() async {
+    if (_isBooking) return;
+
+    setState(() => _isBooking = true);
+
+    try {
+      await widget.bookingRepository.createBooking(
+        eventId: widget.event.id,
+        tickets: widget.selections
+            .map(
+              (item) => BookingTicket(
+                ticketId: item.ticket.id,
+                quantity: item.quantity,
+              ),
+            )
+            .toList(),
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('Booking created successfully.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(error.toString()),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    } finally {
+      if (mounted) {
+        setState(() => _isBooking = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +108,7 @@ class OrderSummaryScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  event.title,
+                  widget.event.title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -65,12 +120,12 @@ class OrderSummaryScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
 
-                _SummaryRow(label: 'Date', value: event.fullDate),
-                _SummaryRow(label: 'Time', value: event.formattedTime),
+                _SummaryRow(label: 'Date', value: widget.event.fullDate),
+                _SummaryRow(label: 'Time', value: widget.event.formattedTime),
 
                 AppDivider(dash: true),
 
-                ...selections.map(
+                ...widget.selections.map(
                   (item) => _SummaryRow(
                     label:
                         '${item.ticket.type} (${item.quantity} x \$${item.ticket.price})',
@@ -163,7 +218,10 @@ class OrderSummaryScreen extends StatelessWidget {
           color: AppColors.background,
           border: Border(top: BorderSide(color: AppColors.border)),
         ),
-        child: PrimaryButton(label: 'Continue to Payment', onPressed: () {}),
+        child: PrimaryButton(
+          label: _isBooking ? 'Creating Booking...' : 'Continue to Payment',
+          onPressed: _isBooking ? null : _continueToPayment,
+        ),
       ),
     );
   }

@@ -24,7 +24,7 @@ class Ticket {
       id: json['id'],
       eventId: json['eventId'],
       type: json['type'],
-      price: json['price'],
+      price: (json['price'] as num).toDouble(),
       totalQuantity: json['totalQuantity'],
       remainingQuantity: json['remainingQuantity'],
       maxPerOrder: json['maxPerOrder'] ?? 2,

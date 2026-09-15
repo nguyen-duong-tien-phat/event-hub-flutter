@@ -34,10 +34,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   Future<void> _fetchEventDetail() async {
     try {
       final eventDetail = await eventRepository.getEventDetail(widget.id);
+      if (!mounted) return;
       setState(() => _event = eventDetail);
     } catch (e) {
       showErrorSnackBar(context, e.toString());
     } finally {
+      if (!mounted) return;
       setState(() => _isFetching = false);
     }
   }
