@@ -34,7 +34,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
   double get _subtotal =>
       widget.selections.fold(0, (sum, item) => sum + item.subtotal);
 
-  double get _serviceFee => _subtotal * 0.02;
+  double get _serviceFee => _subtotal * 0.01;
 
   double get _total => _subtotal + _serviceFee;
 
