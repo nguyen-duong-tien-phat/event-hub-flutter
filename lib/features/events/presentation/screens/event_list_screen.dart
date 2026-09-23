@@ -1,14 +1,15 @@
 import 'package:event_hub_mobile/core/theme/app_theme.dart';
+import 'package:event_hub_mobile/core/widgets/app_button.dart';
+import 'package:event_hub_mobile/core/widgets/loading_indicator.dart';
 import 'package:event_hub_mobile/features/auth/presentations/provider/auth_provider.dart';
-import 'package:event_hub_mobile/features/events/data/repositories/event_repository.dart';
+import 'package:event_hub_mobile/features/events/presentation/provider/event_list_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/models/category.dart';
-import '../../data/models/event.dart';
 import '../widgets/category_pill.dart';
 import '../widgets/event_card.dart';
 import 'event_detail_screen.dart';
@@ -23,45 +24,21 @@ class EventListScreen extends StatefulWidget {
 }
 
 class _EventListScreenState extends State<EventListScreen> {
-  final EventRepository _eventRepository = EventRepository();
-
   String? _locationText;
   bool _permissionDenied = false;
   String _selectedKey = 'my_feed';
-  List<Event> _events = [];
 
   @override
   void initState() {
     super.initState();
-    _initialize();
-  }
-
-  Future<void> _initialize() async {
-    await _fetchEvents();
-
-    if (!mounted) return;
-
-    _getCurrentLocation();
-  }
-
-  Future<void> _fetchEvents() async {
-    try {
-      final events = await _eventRepository.getEvents(page: 1, size: 10);
-
-      if (!mounted) return;
-
-      setState(() {
-        _events = events;
-        // _isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-
-      // setState(() {
-      //   _error = e.toString();
-      //   _isLoading = false;
-      // });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<EventListProvider>().fetchEvents();
+      try {
+        _getCurrentLocation();
+      } catch (e) {
+        debugPrint('location error: $e');
+      }
+    });
   }
 
   Future<void> _getCurrentLocation() async {
@@ -85,7 +62,12 @@ class _EventListScreenState extends State<EventListScreen> {
       return;
     }
 
-    final position = await Geolocator.getCurrentPosition();
+    final position = await Geolocator.getCurrentPosition(
+      locationSettings: LocationSettings(
+        accuracy: LocationAccuracy.high,
+        timeLimit: Duration(seconds: 10),
+      ),
+    );
 
     if (!mounted) return;
 
@@ -109,6 +91,11 @@ class _EventListScreenState extends State<EventListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final eventListProvider = context.watch<EventListProvider>();
+    var events = eventListProvider.events;
+    var error = eventListProvider.error;
+    var loading = eventListProvider.loading;
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -195,29 +182,49 @@ class _EventListScreenState extends State<EventListScreen> {
 
               // --- Event list ---
               Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  itemCount: _events.length,
-                  itemBuilder: (context, index) {
-                    final event = _events[index];
+                child: loading
+                    ? const Center(child: LoadingIndicator())
+                    : error != null
+                    ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(error),
+                            const SizedBox(height: 10),
+                            AppButton(
+                              label: 'Retry',
+                              size: AppButtonSize.small,
+                              variant: AppButtonVariant.outline,
+                              onPressed: context
+                                  .read<EventListProvider>()
+                                  .fetchEvents,
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        itemCount: events.length,
+                        itemBuilder: (context, index) {
+                          final event = events[index];
 
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: EventCard(
-                        event: event,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  EventDetailScreen(id: event.id),
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: EventCard(
+                              event: event,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        EventDetailScreen(id: event.id),
+                                  ),
+                                );
+                              },
                             ),
                           );
                         },
                       ),
-                    );
-                  },
-                ),
               ),
             ],
           ),
