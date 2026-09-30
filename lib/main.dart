@@ -14,7 +14,6 @@ class EventHubApp extends StatelessWidget {
     return MaterialApp(
       title: 'Event Hub',
       theme: AppTheme.light,
-      // darkTheme: AppTheme.dark,
       debugShowCheckedModeBanner: false,
       home: const HomeScreen(),
     );

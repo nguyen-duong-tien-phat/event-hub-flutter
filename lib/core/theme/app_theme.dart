@@ -7,5 +7,6 @@ class AppTheme {
     colorScheme: ColorScheme.fromSeed(seedColor: AppColors.accent),
     textTheme: AppTextTheme.base,
     scaffoldBackgroundColor: AppColors.background,
+    fontFamily: 'Geist',
   );
 }
