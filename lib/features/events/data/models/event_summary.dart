@@ -19,4 +19,7 @@ class EventSummary {
   });
 
   String get time => DateFormat('Hm').format(startsAt);
+  String get month => DateFormat('MMM').format(startsAt);
+  String get day => DateFormat('dd').format(startsAt);
+  String get date => DateFormat('E dd MMM').format(startsAt);
 }
