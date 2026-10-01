@@ -112,23 +112,17 @@ class EventItem extends StatelessWidget {
             children: [
               Text(
                 '${event.date} · ${event.time}',
-                style: context.caption.copyWith(
-                  color: context.accent,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: context.dateLine.copyWith(color: context.accent),
               ),
               Text(
                 event.title,
-                style: context.link,
+                style: context.bodyStrong,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
               Text(
                 event.organizer.fullName,
-                style: context.caption.copyWith(
-                  color: context.muted,
-                  fontSize: 12,
-                ),
+                style: context.meta.copyWith(color: context.muted),
               ),
             ],
           ),

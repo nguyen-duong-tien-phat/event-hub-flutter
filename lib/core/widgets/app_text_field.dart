@@ -72,7 +72,9 @@ class AppTextField extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(12)),
             ),
             hintText: hint,
-            hintStyle: context.bodySmall.copyWith(
+            hintStyle: context.body.copyWith(
+              // body's 1.5 line height pushes the hint off-centre in the field.
+              height: 1.2,
               color: const Color(0xFF8A8E94),
             ),
             contentPadding: const EdgeInsets.symmetric(

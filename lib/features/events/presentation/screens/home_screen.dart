@@ -42,7 +42,20 @@ class HomeScreen extends StatelessWidget {
                               color: context.muted,
                             ),
                           ),
-                          Text('San Francisco, US', style: context.link),
+                          Row(
+                            spacing: 4,
+                            children: [
+                              Text(
+                                'San Francisco, US',
+                                style: context.bodyStrong,
+                              ),
+                              Icon(
+                                LucideIcons.chevronDown,
+                                size: 16,
+                                color: context.muted,
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                       CircleAvatar(

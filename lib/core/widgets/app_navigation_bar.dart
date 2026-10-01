@@ -85,7 +85,7 @@ class _Tab extends StatelessWidget {
             SizedBox(height: 4),
             Text(
               label,
-              style: context.caption.copyWith(
+              style: context.tabLabel.copyWith(
                 color: color,
                 fontWeight: selected ? FontWeight.w600 : null,
               ),

@@ -37,6 +37,9 @@ extension AppTextStyles on BuildContext {
   TextStyle get badge => caption.copyWith(fontWeight: FontWeight.w600);
   TextStyle get meta => caption.copyWith(fontSize: 13);
   TextStyle get metaStrong => meta.copyWith(fontWeight: FontWeight.w600);
+  TextStyle get dateLine => badge.copyWith(letterSpacing: 0.24);
+  TextStyle get tabLabel =>
+      caption.copyWith(fontSize: 11, fontWeight: FontWeight.w500);
   TextStyle get overline => caption.copyWith(
     fontSize: 11,
     fontWeight: FontWeight.w600,

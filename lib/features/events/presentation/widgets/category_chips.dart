@@ -30,7 +30,8 @@ class _CategoryChipsState extends State<CategoryChips> {
           showCheckmark: false,
           label: Text(
             cat,
-            style: context.bodySmall.copyWith(
+            style: context.control.copyWith(
+              fontWeight: isSelected ? FontWeight.w600 : null,
               color: isSelected ? context.surface : context.ink,
             ),
           ),
