@@ -76,14 +76,14 @@ class AppTextField extends StatelessWidget {
               color: const Color(0xFF8A8E94),
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
+              horizontal: 14,
               vertical: 12,
             ),
             // Icons get exact spacing from Padding instead of the default 48px box.
             prefixIcon: prefixIcon == null
                 ? null
                 : Padding(
-                    padding: const EdgeInsets.only(left: 12, right: 8),
+                    padding: const EdgeInsets.only(left: 14, right: 10),
                     child: prefixIcon,
                   ),
             prefixIconConstraints: const BoxConstraints(),
@@ -91,7 +91,7 @@ class AppTextField extends StatelessWidget {
             suffixIcon: suffixIcon == null
                 ? null
                 : Padding(
-                    padding: const EdgeInsets.only(left: 8, right: 12),
+                    padding: const EdgeInsets.only(left: 10, right: 14),
                     child: suffixIcon,
                   ),
             suffixIconConstraints: const BoxConstraints(),

@@ -23,27 +23,36 @@ class _AppNavigationBarState extends State<AppNavigationBar> {
       (icon: LucideIcons.userRound, label: 'Profile'),
     ];
 
-    return Container(
-      padding: EdgeInsets.only(top: 8, left: 10, right: 10, bottom: 20),
-      decoration: BoxDecoration(
-        color: context.surface,
-        border: Border(top: BorderSide(color: context.line)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (final (i, tab) in tabs.indexed)
-            Expanded(
-              child: _Tab(
-                icon: tab.icon,
-                label: tab.label,
-                selected: i == selectedIndex,
-                onTap: () => setState(() {
-                  selectedIndex = i;
-                }),
-              ),
-            ),
-        ],
+    // Material (not Container color) paints the background, so the
+    // InkWell ripple shows on top of it instead of underneath.
+    return Material(
+      color: context.surface,
+      child: Container(
+        padding: EdgeInsets.only(top: 8, left: 12, right: 12),
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: context.line)),
+        ),
+        // Real home-indicator space instead of a fixed 20.
+        child: SafeArea(
+          top: false,
+          minimum: EdgeInsets.only(bottom: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final (i, tab) in tabs.indexed)
+                Expanded(
+                  child: _Tab(
+                    icon: tab.icon,
+                    label: tab.label,
+                    selected: i == selectedIndex,
+                    onTap: () => setState(() {
+                      selectedIndex = i;
+                    }),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -68,7 +77,7 @@ class _Tab extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        padding: EdgeInsets.only(top: 4, bottom: 4),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -82,18 +91,17 @@ class _Tab extends StatelessWidget {
               ),
             ),
             SizedBox(height: 4),
-            if (selected)
-              AnimatedContainer(
-                duration: Duration(milliseconds: 180),
-                child: Container(
-                  width: 4,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: context.accent,
-                  ),
-                ),
+            // Always present (transparent when off) so every tab is the
+            // same height and the color change can animate.
+            AnimatedContainer(
+              duration: Duration(milliseconds: 180),
+              width: 4,
+              height: 4,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: selected ? context.accent : Colors.transparent,
               ),
+            ),
           ],
         ),
       ),

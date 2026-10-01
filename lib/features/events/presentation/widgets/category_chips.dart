@@ -15,7 +15,7 @@ class _CategoryChipsState extends State<CategoryChips> {
   @override
   Widget build(BuildContext context) {
     return Row(
-      spacing: 6,
+      spacing: 8,
       children: widget.categories.map((cat) {
         bool isSelected = cat == selectedCategory;
 
@@ -40,6 +40,9 @@ class _CategoryChipsState extends State<CategoryChips> {
           ),
           backgroundColor: isSelected ? context.ink : context.surface,
           padding: EdgeInsets.symmetric(horizontal: 6),
+          // Drop the invisible 48px tap-target padding so the gaps above
+          // and below the row match the design.
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         );
       }).toList(),
     );

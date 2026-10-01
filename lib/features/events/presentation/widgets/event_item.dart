@@ -18,68 +18,76 @@ class EventItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (variant == EventItemVariant.featured) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  event.imageUrl,
-                  fit: BoxFit.cover,
-                  height: 180,
-                  width: 280,
-                  alignment: Alignment.bottomCenter,
-                ),
-              ),
-              Positioned(
-                left: 12,
-                top: 12,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: context.surface,
-                    borderRadius: BorderRadius.circular(8),
+      return SizedBox(
+        width: 280,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.network(
+                    event.imageUrl,
+                    fit: BoxFit.cover,
+                    height: 180,
+                    width: 280,
+                    alignment: Alignment.bottomCenter,
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                  child: Column(
-                    children: [
-                      Text(
-                        event.month.toUpperCase(),
-                        style: context.dateBadgeMonth.copyWith(
-                          color: context.accent,
+                ),
+                Positioned(
+                  left: 12,
+                  top: 12,
+                  child: Container(
+                    width: 44,
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 6),
+                    child: Column(
+                      children: [
+                        Text(
+                          event.month.toUpperCase(),
+                          style: context.dateBadgeMonth.copyWith(
+                            color: context.accent,
+                          ),
                         ),
-                      ),
-                      Text(event.day, style: context.cardTitle),
-                    ],
+                        Text(
+                          event.day,
+                          style: context.cardTitle.copyWith(height: 1.1),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Positioned(
-                right: 12,
-                top: 12,
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: context.surface,
-                    borderRadius: BorderRadius.circular(99),
+                Positioned(
+                  right: 12,
+                  top: 12,
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: context.surface,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(LucideIcons.heart, size: 18),
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                  child: Icon(LucideIcons.heart, size: 18),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 12),
-          Text(event.title, style: context.subhead),
-          Text(
-            '${event.location} · ${event.time}',
-            style: context.meta.copyWith(color: context.muted),
-          ),
-          SizedBox(height: 4),
-          Text(event.organizer.fullName, style: context.metaStrong),
-        ],
+              ],
+            ),
+            SizedBox(height: 12),
+            Text(event.title, style: context.subhead),
+            SizedBox(height: 4),
+            Text(
+              '${event.location} · ${event.time}',
+              style: context.meta.copyWith(color: context.muted),
+            ),
+            SizedBox(height: 6),
+            Text(event.organizer.fullName, style: context.metaStrong),
+          ],
+        ),
       );
     }
 
@@ -99,7 +107,7 @@ class EventItem extends StatelessWidget {
 
         Expanded(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            spacing: 3,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -126,7 +134,10 @@ class EventItem extends StatelessWidget {
           ),
         ),
 
-        Icon(LucideIcons.heart),
+        Padding(
+          padding: EdgeInsets.all(8),
+          child: Icon(LucideIcons.heart, size: 20, color: context.muted),
+        ),
       ],
     );
   }
