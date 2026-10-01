@@ -1,5 +1,6 @@
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:event_hub_mobile/core/widgets/app_button.dart';
+import 'package:event_hub_mobile/core/widgets/app_navigation_bar.dart';
 import 'package:event_hub_mobile/core/widgets/app_text_field.dart';
 import 'package:event_hub_mobile/features/auth/data/models/user.dart';
 import 'package:event_hub_mobile/features/events/data/models/event_summary.dart';
@@ -14,6 +15,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: AppNavigationBar(),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(16),
@@ -69,7 +71,7 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
 
-              SizedBox(height: 16),
+              SizedBox(height: 8),
 
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -78,25 +80,54 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 28),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 20),
+                      Text('Featured this week', style: context.headline),
 
-              Text('Featured this week', style: context.title),
+                      SizedBox(height: 10),
+                      EventItem(
+                        variant: EventItemVariant.featured,
+                        event: EventSummary(
+                          id: 'id',
+                          title: 'Midnight Echoes Live',
+                          organizer: User(
+                            id: 'user',
+                            email: 'email',
+                            fullName: 'Fort Mason Center',
+                            role: UserRole.organizer,
+                          ),
+                          startsAt: DateTime(2026, 1, 1, 20, 0, 0),
+                          location: 'The Fillmore',
+                          imageUrl: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&h=400&fit=crop',
+                        ),
+                      ),
 
-              SizedBox(height: 14),
-              EventItem(
-                variant: EventItemVariant.featured,
-                event: EventSummary(
-                  id: 'id',
-                  title: 'Midnight Echoes Live',
-                  organizer: User(
-                    id: 'user',
-                    email: 'email',
-                    fullName: 'Fort Mason Center',
-                    role: UserRole.organizer,
+                      SizedBox(height: 28),
+
+                      Text('This weekend', style: context.headline),
+
+                      SizedBox(height: 10),
+                      EventItem(
+                        event: EventSummary(
+                          id: 'id',
+                          title: 'Midnight Echoes Live',
+                          organizer: User(
+                            id: 'user',
+                            email: 'email',
+                            fullName: 'Fort Mason Center',
+                            role: UserRole.organizer,
+                          ),
+                          startsAt: DateTime(2026, 1, 1, 20, 0, 0),
+                          location: 'The Fillmore',
+                          imageUrl: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&h=400&fit=crop',
+                        ),
+                      ),
+                    ],
                   ),
-                  startsAt: DateTime(2026, 1, 1, 20, 0, 0),
-                  location: 'The Fillmore',
-                  imageUrl: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&h=400&fit=crop',
                 ),
               ),
             ],
