@@ -28,14 +28,14 @@ class _AppNavigationBarState extends State<AppNavigationBar> {
     return Material(
       color: context.surface,
       child: Container(
-        padding: EdgeInsets.only(top: 8, left: 12, right: 12),
+        padding: const EdgeInsets.only(top: 8, left: 12, right: 12),
         decoration: BoxDecoration(
           border: Border(top: BorderSide(color: context.line)),
         ),
         // Real home-indicator space instead of a fixed 20.
         child: SafeArea(
           top: false,
-          minimum: EdgeInsets.only(bottom: 8),
+          minimum: const EdgeInsets.only(bottom: 8),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -77,12 +77,12 @@ class _Tab extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: EdgeInsets.only(top: 4, bottom: 4),
+        padding: const EdgeInsets.only(top: 4, bottom: 4),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 22, color: color),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               label,
               style: context.tabLabel.copyWith(
@@ -90,11 +90,11 @@ class _Tab extends StatelessWidget {
                 fontWeight: selected ? FontWeight.w600 : null,
               ),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             // Always present (transparent when off) so every tab is the
             // same height and the color change can animate.
             AnimatedContainer(
-              duration: Duration(milliseconds: 180),
+              duration: const Duration(milliseconds: 180),
               width: 4,
               height: 4,
               decoration: BoxDecoration(

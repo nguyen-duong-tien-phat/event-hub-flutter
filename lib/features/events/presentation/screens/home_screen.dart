@@ -18,13 +18,13 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: AppNavigationBar(),
+      bottomNavigationBar: const AppNavigationBar(),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(_gutter, 8, _gutter, 0),
+              padding: const EdgeInsets.fromLTRB(_gutter, 8, _gutter, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -71,21 +71,21 @@ class HomeScreen extends StatelessWidget {
 
                   // BODY
                   Padding(
-                    padding: EdgeInsets.only(top: 18, bottom: 16),
+                    padding: const EdgeInsets.only(top: 18, bottom: 16),
                     child: Text('Discover', style: context.display),
                   ),
 
                   // SEARCH
                   Row(
                     children: [
-                      Expanded(
+                      const Expanded(
                         child: AppTextField(
                           hint: 'Search events, venues, artists',
                           prefixIcon: Icon(LucideIcons.search),
                         ),
                       ),
 
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
 
                       AppButton.icon(
                         tooltip: 'Filter',
@@ -99,62 +99,100 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Padding goes on the scroll view, not around it, so chips
             // line up with the gutter but still scroll to the screen edge.
-            SingleChildScrollView(
+            const SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.symmetric(horizontal: _gutter),
               child: CategoryChips(
                 categories: ['My feed', 'Concerts', 'Food', 'Art'],
               ),
             ),
+            const SizedBox(height: 14),
 
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(_gutter, 28, _gutter, 24),
+                padding: const EdgeInsets.only(top: 14, bottom: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Featured this week', style: context.headline),
-
-                    SizedBox(height: 14),
-                    EventItem(
-                      variant: EventItemVariant.featured,
-                      event: EventSummary(
-                        id: 'id',
-                        title: 'Midnight Echoes Live',
-                        organizer: User(
-                          id: 'user',
-                          email: 'email',
-                          fullName: 'Fort Mason Center',
-                          role: UserRole.organizer,
-                        ),
-                        startsAt: DateTime(2026, 1, 1, 20, 0, 0),
-                        location: 'The Fillmore',
-                        imageUrl: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&h=400&fit=crop',
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: _gutter),
+                      child: Text(
+                        'Featured this week',
+                        style: context.headline,
                       ),
                     ),
 
-                    SizedBox(height: 28),
+                    const SizedBox(height: 14),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: _gutter),
+                      child: Row(
+                        spacing: 10,
+                        children: [
+                          EventItem(
+                            variant: EventItemVariant.featured,
+                            event: EventSummary(
+                              id: 'id',
+                              title: 'Midnight Echoes Live',
+                              organizer: const User(
+                                id: 'user',
+                                email: 'email',
+                                fullName: 'Fort Mason Center',
+                                role: UserRole.organizer,
+                              ),
+                              startsAt: DateTime(2026, 1, 1, 20, 0, 0),
+                              location: 'The Fillmore',
+                              imageUrl: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&h=400&fit=crop',
+                            ),
+                          ),
+                          EventItem(
+                            variant: EventItemVariant.featured,
+                            event: EventSummary(
+                              id: 'id',
+                              title: 'Midnight Echoes Live',
+                              organizer: const User(
+                                id: 'user',
+                                email: 'email',
+                                fullName: 'Fort Mason Center',
+                                role: UserRole.organizer,
+                              ),
+                              startsAt: DateTime(2026, 1, 1, 20, 0, 0),
+                              location: 'The Fillmore',
+                              imageUrl: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&h=400&fit=crop',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
 
-                    Text('This weekend', style: context.headline),
+                    const SizedBox(height: 28),
 
-                    SizedBox(height: 14),
-                    EventItem(
-                      event: EventSummary(
-                        id: 'id',
-                        title: 'Midnight Echoes Live',
-                        organizer: User(
-                          id: 'user',
-                          email: 'email',
-                          fullName: 'Fort Mason Center',
-                          role: UserRole.organizer,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: _gutter),
+                      child: Text('This weekend', style: context.headline),
+                    ),
+
+                    const SizedBox(height: 14),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: _gutter),
+                      child: EventItem(
+                        event: EventSummary(
+                          id: 'id',
+                          title: 'Midnight Echoes Live',
+                          organizer: const User(
+                            id: 'user',
+                            email: 'email',
+                            fullName: 'Fort Mason Center',
+                            role: UserRole.organizer,
+                          ),
+                          startsAt: DateTime(2026, 1, 1, 20, 0, 0),
+                          location: 'The Fillmore',
+                          imageUrl: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&h=400&fit=crop',
                         ),
-                        startsAt: DateTime(2026, 1, 1, 20, 0, 0),
-                        location: 'The Fillmore',
-                        imageUrl: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&h=400&fit=crop',
                       ),
                     ),
                   ],

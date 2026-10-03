@@ -61,15 +61,15 @@ class AppTextField extends StatelessWidget {
             fillColor: context.surface,
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: context.line),
-              borderRadius: BorderRadius.all(Radius.circular(12)),
+              borderRadius: const BorderRadius.all(Radius.circular(12)),
             ),
             focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(color: context.accent),
-              borderRadius: BorderRadius.all(Radius.circular(12)),
+              borderRadius: const BorderRadius.all(Radius.circular(12)),
             ),
             errorBorder: OutlineInputBorder(
               borderSide: BorderSide(color: context.danger),
-              borderRadius: BorderRadius.all(Radius.circular(12)),
+              borderRadius: const BorderRadius.all(Radius.circular(12)),
             ),
             hintText: hint,
             hintStyle: context.body.copyWith(

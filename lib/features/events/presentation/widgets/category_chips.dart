@@ -40,7 +40,7 @@ class _CategoryChipsState extends State<CategoryChips> {
             borderRadius: BorderRadius.circular(99),
           ),
           backgroundColor: isSelected ? context.ink : context.surface,
-          padding: EdgeInsets.symmetric(horizontal: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 6),
           // Drop the invisible 48px tap-target padding so the gaps above
           // and below the row match the design.
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

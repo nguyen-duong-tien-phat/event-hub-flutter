@@ -59,7 +59,7 @@ class EventItem extends StatelessWidget {
                       color: context.surface,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    padding: EdgeInsets.symmetric(vertical: 6),
+                    padding: const EdgeInsets.symmetric(vertical: 6),
                     child: Column(
                       children: [
                         Text(
@@ -87,19 +87,19 @@ class EventItem extends StatelessWidget {
                       borderRadius: BorderRadius.circular(99),
                     ),
                     alignment: Alignment.center,
-                    child: Icon(LucideIcons.heart, size: 18),
+                    child: const Icon(LucideIcons.heart, size: 18),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(event.title, style: context.subhead),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               '${event.location} · ${event.time}',
               style: context.meta.copyWith(color: context.muted),
             ),
-            SizedBox(height: 6),
+            const SizedBox(height: 6),
             Text(event.organizer.fullName, style: context.metaStrong),
           ],
         ),
@@ -144,7 +144,7 @@ class EventItem extends StatelessWidget {
         ),
 
         Padding(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
           child: Icon(LucideIcons.heart, size: 20, color: context.muted),
         ),
       ],
