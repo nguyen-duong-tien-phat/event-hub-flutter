@@ -1,4 +1,4 @@
-import 'package:event_hub_mobile/features/auth/data/models/user.dart';
+import 'package:event_hub_mobile/features/auth/data/models/organizer.dart';
 import 'package:intl/intl.dart';
 
 class EventSummary {
@@ -7,7 +7,7 @@ class EventSummary {
   final DateTime startsAt;
   final String location;
   final String imageUrl;
-  final User organizer;
+  final Organizer organizer;
 
   const EventSummary({
     required this.id,
@@ -17,6 +17,17 @@ class EventSummary {
     required this.location,
     required this.imageUrl,
   });
+
+  factory fromJson(Map<String, dynamic> json) {
+    return EventSummary(
+      id: json['id'],
+      title: json['title'],
+      organizer: Organizer.fromJson(json['organizer'] as Map<String, dynamic>),
+      startsAt: DateTime.parse(json['startsAt']),
+      location: json['location'],
+      imageUrl: json['imageUrl'],
+    );
+  }
 
   String get time => DateFormat('Hm').format(startsAt);
   String get month => DateFormat('MMM').format(startsAt);

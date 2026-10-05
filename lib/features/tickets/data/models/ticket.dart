@@ -18,4 +18,17 @@ class Ticket {
     required this.highlights,
     required this.maxPerOrder,
   });
+
+  factory fromJson(Map<String, dynamic> json) {
+    return Ticket(
+      id: json['id'],
+      eventId: json['eventId'],
+      type: json['type'],
+      price: (json['price'] as num).toDouble(),
+      totalQuantity: json['totalQuantity'],
+      remainingQuantity: json['remainingQuantity'],
+      highlights: List<String>.from(json['highlights']),
+      maxPerOrder: json['maxPerOrder'],
+    );
+  }
 }

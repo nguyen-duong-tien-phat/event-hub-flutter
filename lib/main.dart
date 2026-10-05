@@ -1,9 +1,10 @@
 import 'package:event_hub_mobile/core/theme/app_theme.dart';
 import 'package:event_hub_mobile/features/events/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const EventHubApp());
+  runApp(const ProviderScope(child: EventHubApp()));
 }
 
 class EventHubApp extends StatelessWidget {

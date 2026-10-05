@@ -2,11 +2,13 @@ import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:event_hub_mobile/core/widgets/app_button.dart';
 import 'package:event_hub_mobile/core/widgets/app_navigation_bar.dart';
 import 'package:event_hub_mobile/core/widgets/app_text_field.dart';
-import 'package:event_hub_mobile/features/auth/data/models/user.dart';
+import 'package:event_hub_mobile/features/auth/data/models/organizer.dart';
 import 'package:event_hub_mobile/features/events/data/models/event_summary.dart';
+import 'package:event_hub_mobile/features/events/presentation/providers/events_provider.dart';
 import 'package:event_hub_mobile/features/events/presentation/widgets/category_chips.dart';
 import 'package:event_hub_mobile/features/events/presentation/widgets/event_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -127,47 +129,7 @@ class HomeScreen extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 14),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: _gutter),
-                      child: Row(
-                        spacing: 10,
-                        children: [
-                          EventItem(
-                            variant: EventItemVariant.featured,
-                            event: EventSummary(
-                              id: 'id',
-                              title: 'Midnight Echoes Live',
-                              organizer: const User(
-                                id: 'user',
-                                email: 'email',
-                                fullName: 'Fort Mason Center',
-                                role: UserRole.organizer,
-                              ),
-                              startsAt: DateTime(2026, 1, 1, 20, 0, 0),
-                              location: 'The Fillmore',
-                              imageUrl: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&h=400&fit=crop',
-                            ),
-                          ),
-                          EventItem(
-                            variant: EventItemVariant.featured,
-                            event: EventSummary(
-                              id: 'id',
-                              title: 'Midnight Echoes Live',
-                              organizer: const User(
-                                id: 'user',
-                                email: 'email',
-                                fullName: 'Fort Mason Center',
-                                role: UserRole.organizer,
-                              ),
-                              startsAt: DateTime(2026, 1, 1, 20, 0, 0),
-                              location: 'The Fillmore',
-                              imageUrl: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&h=400&fit=crop',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    const _FeaturedEvents(),
 
                     const SizedBox(height: 28),
 
@@ -183,11 +145,9 @@ class HomeScreen extends StatelessWidget {
                         event: EventSummary(
                           id: 'id',
                           title: 'Midnight Echoes Live',
-                          organizer: const User(
+                          organizer: const Organizer(
                             id: 'user',
-                            email: 'email',
                             fullName: 'Fort Mason Center',
-                            role: UserRole.organizer,
                           ),
                           startsAt: DateTime(2026, 1, 1, 20, 0, 0),
                           location: 'The Fillmore',
@@ -202,6 +162,45 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _FeaturedEvents extends ConsumerWidget {
+  const _FeaturedEvents();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final featured = ref.watch(featuredEventsProvider);
+
+    final children = featured.when(
+      data: (events) => events.isEmpty
+          ? [Text('No events this week', style: context.caption)]
+          : [
+              for (final event in events)
+                EventItem(event: event, variant: EventItemVariant.featured),
+            ],
+      error: (error, stackTrace) {
+        debugPrint('❌ featuredEvents: $error');
+        debugPrint('$stackTrace');
+        return [
+          Text('Could not load events', style: context.caption),
+          TextButton(
+            onPressed: () => ref.invalidate(featuredEventsProvider),
+            child: const Text('Retry'),
+          ),
+        ];
+      },
+      loading: () => [
+        for (var i = 0; i < 3; i++)
+          const EventItem(event: null, variant: EventItemVariant.featured),
+      ],
+    );
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: HomeScreen._gutter),
+      child: Row(spacing: 10, children: children),
     );
   }
 }
