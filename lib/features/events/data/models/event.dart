@@ -1,4 +1,4 @@
-import 'package:event_hub_mobile/features/auth/data/models/user.dart';
+import 'package:event_hub_mobile/features/auth/data/models/organizer.dart';
 import 'package:event_hub_mobile/features/events/data/models/event_summary.dart';
 import 'package:event_hub_mobile/features/tickets/data/models/ticket.dart';
 
@@ -23,7 +23,7 @@ class Event extends EventSummary {
     return Event(
       id: json['id'],
       title: json['title'],
-      organizer: User.fromJson(json['organizer'] as Map<String, dynamic>),
+      organizer: Organizer.fromJson(json['organizer'] as Map<String, dynamic>),
       startsAt: DateTime.parse(json['startsAt'] as String),
       location: json['location'],
       imageUrl: json['imageUrl'],

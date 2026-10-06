@@ -33,6 +33,26 @@ class EventRepository {
       ),
     );
   }
+
+  Future<List<EventSummary>> getFeturedEvents(int limit) {
+    return _apiClient.get(
+      '/events/featured',
+      queryParameters: {'limit': limit},
+      parser: (json) => (json as List)
+          .map((event) => EventSummary.fromJson(event as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Future<List<EventSummary>> getUpcomingEvents(int limit) {
+    return _apiClient.get(
+      '/events/upcoming',
+      queryParameters: {'limit': limit},
+      parser: (json) => (json as List)
+          .map((event) => EventSummary.fromJson(event as Map<String, dynamic>))
+          .toList(),
+    );
+  }
 }
 
 @Riverpod(keepAlive: true)

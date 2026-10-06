@@ -2,10 +2,7 @@ import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:event_hub_mobile/core/widgets/app_button.dart';
 import 'package:event_hub_mobile/core/widgets/app_navigation_bar.dart';
 import 'package:event_hub_mobile/core/widgets/app_text_field.dart';
-import 'package:event_hub_mobile/features/auth/data/models/organizer.dart';
-import 'package:event_hub_mobile/features/events/data/models/event_summary.dart';
 import 'package:event_hub_mobile/features/events/presentation/providers/events_provider.dart';
-import 'package:event_hub_mobile/features/events/presentation/widgets/category_chips.dart';
 import 'package:event_hub_mobile/features/events/presentation/widgets/event_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -105,27 +102,23 @@ class HomeScreen extends StatelessWidget {
 
             // Padding goes on the scroll view, not around it, so chips
             // line up with the gutter but still scroll to the screen edge.
-            const SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: _gutter),
-              child: CategoryChips(
-                categories: ['My feed', 'Concerts', 'Food', 'Art'],
-              ),
-            ),
-            const SizedBox(height: 14),
-
+            // const SingleChildScrollView(
+            //   scrollDirection: Axis.horizontal,
+            //   padding: EdgeInsets.symmetric(horizontal: _gutter),
+            //   child: CategoryChips(
+            //     categories: ['My feed', 'Concerts', 'Food', 'Art'],
+            //   ),
+            // ),
+            // const SizedBox(height: 14),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.only(top: 14, bottom: 24),
+                padding: const EdgeInsets.only(bottom: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: _gutter),
-                      child: Text(
-                        'Featured this week',
-                        style: context.headline,
-                      ),
+                      child: Text('Featured Events', style: context.headline),
                     ),
 
                     const SizedBox(height: 14),
@@ -135,25 +128,13 @@ class HomeScreen extends StatelessWidget {
 
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: _gutter),
-                      child: Text('This weekend', style: context.headline),
+                      child: Text('Upcoming Events', style: context.headline),
                     ),
 
                     const SizedBox(height: 14),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: _gutter),
-                      child: EventItem(
-                        event: EventSummary(
-                          id: 'id',
-                          title: 'Midnight Echoes Live',
-                          organizer: const Organizer(
-                            id: 'user',
-                            fullName: 'Fort Mason Center',
-                          ),
-                          startsAt: DateTime(2026, 1, 1, 20, 0, 0),
-                          location: 'The Fillmore',
-                          imageUrl: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&h=400&fit=crop',
-                        ),
-                      ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: _gutter),
+                      child: _UpcomingEvents(),
                     ),
                   ],
                 ),
@@ -202,5 +183,34 @@ class _FeaturedEvents extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: HomeScreen._gutter),
       child: Row(spacing: 10, children: children),
     );
+  }
+}
+
+class _UpcomingEvents extends ConsumerWidget {
+  const _UpcomingEvents();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final featured = ref.watch(upcomingEventsProvider);
+
+    final children = featured.when(
+      data: (events) => events.isEmpty
+          ? [Text('No events upcoming', style: context.caption)]
+          : [for (final event in events) EventItem(event: event)],
+      error: (error, stackTrace) {
+        debugPrint('❌ upcomingEvents: $error');
+        debugPrint('$stackTrace');
+        return [
+          Text('Could not load events', style: context.caption),
+          TextButton(
+            onPressed: () => ref.invalidate(upcomingEventsProvider),
+            child: const Text('Retry'),
+          ),
+        ];
+      },
+      loading: () => [for (var i = 0; i < 3; i++) const EventItem(event: null)],
+    );
+
+    return Column(spacing: 10, children: children);
   }
 }
