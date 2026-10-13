@@ -1,7 +1,5 @@
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
-import 'package:event_hub_mobile/core/widgets/app_button.dart';
 import 'package:event_hub_mobile/core/widgets/app_navigation_bar.dart';
-import 'package:event_hub_mobile/core/widgets/app_text_field.dart';
 import 'package:event_hub_mobile/features/events/presentation/providers/events_provider.dart';
 import 'package:event_hub_mobile/features/events/presentation/widgets/event_item.dart';
 import 'package:flutter/material.dart';
@@ -69,47 +67,37 @@ class HomeScreen extends StatelessWidget {
                   ),
 
                   // BODY
-                  Padding(
-                    padding: const EdgeInsets.only(top: 18, bottom: 16),
-                    child: Text('Discover', style: context.display),
-                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.only(top: 18, bottom: 16),
+                  //   child: Text('Discover', style: context.display),
+                  // ),
 
-                  // SEARCH
-                  Row(
-                    children: [
-                      const Expanded(
-                        child: AppTextField(
-                          hint: 'Search events, venues, artists',
-                          prefixIcon: Icon(LucideIcons.search),
-                        ),
-                      ),
+                  // // SEARCH
+                  // Row(
+                  //   children: [
+                  //     const Expanded(
+                  //       child: AppTextField(
+                  //         hint: 'Search events, venues, artists',
+                  //         prefixIcon: Icon(LucideIcons.search),
+                  //       ),
+                  //     ),
 
-                      const SizedBox(width: 10),
+                  //     const SizedBox(width: 10),
 
-                      AppButton.icon(
-                        tooltip: 'Filter',
-                        variant: AppButtonVariant.secondary,
-                        icon: LucideIcons.sliders,
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
+                  //     AppButton.icon(
+                  //       tooltip: 'Filter',
+                  //       variant: AppButtonVariant.secondary,
+                  //       icon: LucideIcons.sliders,
+                  //       onPressed: () {},
+                  //     ),
+                  //   ],
+                  // ),
                 ],
               ),
             ),
 
             const SizedBox(height: 16),
 
-            // Padding goes on the scroll view, not around it, so chips
-            // line up with the gutter but still scroll to the screen edge.
-            // const SingleChildScrollView(
-            //   scrollDirection: Axis.horizontal,
-            //   padding: EdgeInsets.symmetric(horizontal: _gutter),
-            //   child: CategoryChips(
-            //     categories: ['My feed', 'Concerts', 'Food', 'Art'],
-            //   ),
-            // ),
-            // const SizedBox(height: 14),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.only(bottom: 24),
