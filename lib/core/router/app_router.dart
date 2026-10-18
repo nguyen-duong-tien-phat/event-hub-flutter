@@ -3,7 +3,8 @@ import 'package:event_hub_mobile/features/auth/presentation/screens/check_email_
 import 'package:event_hub_mobile/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:event_hub_mobile/features/auth/presentation/screens/login_screen.dart';
 import 'package:event_hub_mobile/features/auth/presentation/screens/signup_screen.dart';
-import 'package:event_hub_mobile/features/auth/presentation/screens/splash_screen.dart';
+import 'package:event_hub_mobile/features/auth/presentation/providers/splash_provider.dart';
+import 'package:event_hub_mobile/features/auth/presentation/screens/splash_route.dart';
 import 'package:event_hub_mobile/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:event_hub_mobile/features/events/presentation/screens/home_screen.dart';
 import 'package:flutter/foundation.dart';
@@ -25,6 +26,7 @@ const _authPaths = {
 GoRouter appRouter(Ref ref) {
   final refresh = ValueNotifier(0);
   ref.listen(authProvider, (_, _) => refresh.value++);
+  ref.listen(splashDoneProvider, (_, _) => refresh.value++);
   ref.onDispose(refresh.dispose);
 
   return GoRouter(
@@ -40,6 +42,8 @@ GoRouter appRouter(Ref ref) {
 
       final loggedIn = auth.value != null;
       if (location == AppRoutes.splash) {
+        // Stay until the Splash has finished its hop and the reveal.
+        if (!ref.read(splashDoneProvider)) return null;
         return loggedIn ? AppRoutes.home : AppRoutes.welcome;
       }
       if (!loggedIn && !_authPaths.contains(location)) return AppRoutes.welcome;
@@ -48,10 +52,13 @@ GoRouter appRouter(Ref ref) {
       return null;
     },
     routes: [
-      GoRoute(path: AppRoutes.splash, builder: (_, _) => const SplashScreen()),
+      GoRoute(path: AppRoutes.splash, builder: (_, _) => const SplashRoute()),
+      // Welcome and Home have no transition of their own: the Splash has
+      // already revealed them, so swapping in the real page must look the same.
       GoRoute(
         path: AppRoutes.welcome,
-        builder: (_, _) => const WelcomeScreen(),
+        pageBuilder: (_, state) =>
+            NoTransitionPage(key: state.pageKey, child: const WelcomeScreen()),
       ),
       GoRoute(path: AppRoutes.login, builder: (_, _) => const LoginScreen()),
       GoRoute(path: AppRoutes.signup, builder: (_, _) => const SignupScreen()),
@@ -64,7 +71,11 @@ GoRouter appRouter(Ref ref) {
         builder: (_, state) =>
             CheckEmailScreen(email: (state.extra as String?) ?? ''),
       ),
-      GoRoute(path: AppRoutes.home, builder: (_, _) => const HomeScreen()),
+      GoRoute(
+        path: AppRoutes.home,
+        pageBuilder: (_, state) =>
+            NoTransitionPage(key: state.pageKey, child: const HomeScreen()),
+      ),
     ],
   );
 }
