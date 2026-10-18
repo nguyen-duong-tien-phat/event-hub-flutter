@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:event_hub_mobile/core/config/env.dart';
 import 'package:event_hub_mobile/core/network/api_client.dart';
+import 'package:event_hub_mobile/core/network/token_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'network_provider.g.dart';
@@ -20,6 +21,20 @@ Dio dio(Ref ref) {
   );
 
   // interceptors
+  dio.interceptors.add(
+    InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        final token = await ref.read(tokenProvider).read();
+        if (token != null) options.headers['Authorization'] = 'Bearer $token';
+        handler.next(options);
+      },
+      onError: (error, handler) async {
+        final status = error.response?.statusCode;
+        if (status == 401) await ref.read(tokenProvider).clear();
+        handler.next(error);
+      },
+    ),
+  );
 
   ref.onDispose(dio.close);
   return dio;

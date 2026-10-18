@@ -1,5 +1,5 @@
 import 'package:event_hub_mobile/core/theme/app_theme.dart';
-import 'package:event_hub_mobile/features/events/presentation/screens/home_screen.dart';
+import 'package:event_hub_mobile/features/auth/presentation/screens/auth_gate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,7 +16,7 @@ class EventHubApp extends StatelessWidget {
       title: 'Event Hub',
       theme: AppTheme.light,
       debugShowCheckedModeBanner: false,
-      home: const HomeScreen(),
+      home: const AuthGate(),
     );
   }
 }

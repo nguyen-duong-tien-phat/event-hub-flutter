@@ -58,3 +58,9 @@ class UnknownException extends ApiException {
     super.statusCode,
   });
 }
+
+class TooManyRequestException extends ApiException {
+  const TooManyRequestException({
+    super.message = 'Too many requests. Please try again later.',
+  }) : super(statusCode: 429);
+}

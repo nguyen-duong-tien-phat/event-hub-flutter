@@ -11,11 +11,12 @@ class ApiClient {
 
   Future<T> _send<T>(
     Future<Response> Function() request,
-    T Function(dynamic json) parser,
+    T Function(dynamic json)? parser,
   ) async {
     try {
       final response = await request();
-      return parser(response.data);
+      if (parser != null) return parser(response.data);
+      return response.data as T;
     } on DioException catch (e) {
       throw _mapDioException(e);
     } catch (e) {
@@ -41,7 +42,7 @@ class ApiClient {
     String path, {
     Map<String, dynamic>? queryParameters,
     dynamic data,
-    required T Function(dynamic json) parser,
+    T Function(dynamic json)? parser,
   }) async {
     return _send(
       () => _dio.post(path, queryParameters: queryParameters, data: data),
@@ -53,7 +54,7 @@ class ApiClient {
     String path, {
     Map<String, dynamic>? queryParameters,
     dynamic data,
-    required T Function(dynamic json) parser,
+    T Function(dynamic json)? parser,
   }) async {
     return _send(
       () => _dio.put(path, queryParameters: queryParameters, data: data),
@@ -65,7 +66,7 @@ class ApiClient {
     String path, {
     Map<String, dynamic>? queryParameters,
     dynamic data,
-    required T Function(dynamic json) parser,
+    T Function(dynamic json)? parser,
   }) async {
     return _send(
       () => _dio.delete(path, queryParameters: queryParameters, data: data),
@@ -109,9 +110,14 @@ ApiException _fromResponse(Response? response) {
       statusCode: status,
       fieldErrors: _readFieldErrors(data),
     ),
-    401 => const UnauthorizedException(),
+    401 => _readMessage(data) == null
+        ? const UnauthorizedException()
+        : UnauthorizedException(message: _readMessage(data)!),
     403 => const ForbiddenException(),
     404 => const NotFoundException(),
+    429 => _readMessage(data) == null
+        ? const TooManyRequestException()
+        : TooManyRequestException(message: _readMessage(data)!),
     final code? when code >= 500 => ServerException(statusCode: code),
     _ => UnknownException(statusCode: status),
   };

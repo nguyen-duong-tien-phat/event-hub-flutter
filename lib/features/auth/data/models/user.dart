@@ -13,12 +13,13 @@ class User {
     required this.role,
   });
 
-  factory fromJson(Map<String, dynamic> json) {
+  factory User.fromJson(Map<String, dynamic> json) {
+    final roleName = (json['role'] as String).toLowerCase();
     return User(
-      id: json['id'],
-      email: json['email'],
-      fullName: json['fullName'],
-      role: UserRole.values.byName(json['role'] as String),
+      id: json['id'] as String,
+      email: json['email'] as String,
+      fullName: json['fullName'] as String,
+      role: UserRole.values.firstWhere((r) => r.name == roleName),
     );
   }
 }

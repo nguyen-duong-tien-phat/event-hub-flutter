@@ -1,7 +1,12 @@
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:flutter/material.dart';
 
-class AppTextField extends StatelessWidget {
+/// Text field with a label above it.
+///
+/// Validation errors are shown per field only once the user has left it
+/// ("touched"), then kept live while they fix it. `Form.validate()` (e.g. on
+/// submit) shows the errors of every field at once.
+class AppTextField extends StatefulWidget {
   final String? label;
   final String? hint;
   final TextEditingController? controller;
@@ -34,24 +39,74 @@ class AppTextField extends StatelessWidget {
   });
 
   @override
+  State<AppTextField> createState() => _AppTextFieldState();
+}
+
+class _AppTextFieldState extends State<AppTextField> {
+  static const _radius = BorderRadius.all(Radius.circular(12));
+
+  final _focusNode = FocusNode();
+  final _fieldKey = GlobalKey<FormFieldState<String>>();
+
+  /// True once the user has left the field (or edited it while it shows an
+  /// error). From then on the field validates live.
+  bool _touched = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (!_focusNode.hasFocus && !_touched) setState(() => _touched = true);
+  }
+
+  void _onChanged(String value) {
+    // An error from a submit is showing: start validating live so it clears
+    // as soon as the input is fixed.
+    if (!_touched && _fieldKey.currentState?.hasError == true) {
+      setState(() => _touched = true);
+    }
+    widget.onChanged?.call(value);
+  }
+
+  OutlineInputBorder _border(Color color, [double width = 1]) =>
+      OutlineInputBorder(
+        borderSide: BorderSide(color: color, width: width),
+        borderRadius: _radius,
+      );
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (label != null) ...[
-          Text(label!, style: context.fieldLabel),
+        if (widget.label != null) ...[
+          Text(widget.label!, style: context.fieldLabel),
           const SizedBox(height: 6),
         ],
         TextFormField(
-          controller: controller,
-          validator: validator,
-          keyboardType: keyboardType,
-          textInputAction: textInputAction,
-          autofillHints: autofillHints,
-          obscureText: obscureText,
-          enabled: enabled,
-          onChanged: onChanged,
-          onFieldSubmitted: onSubmitted,
+          key: _fieldKey,
+          focusNode: _focusNode,
+          controller: widget.controller,
+          validator: widget.validator,
+          autovalidateMode: _touched
+              ? AutovalidateMode.always
+              : AutovalidateMode.disabled,
+          keyboardType: widget.keyboardType,
+          textInputAction: widget.textInputAction,
+          autofillHints: widget.autofillHints,
+          obscureText: widget.obscureText,
+          enabled: widget.enabled,
+          onChanged: _onChanged,
+          onFieldSubmitted: widget.onSubmitted,
           onTapOutside: (event) {
             FocusScope.of(context).unfocus();
           },
@@ -59,19 +114,15 @@ class AppTextField extends StatelessWidget {
             isDense: true,
             filled: true,
             fillColor: context.surface,
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: context.line),
-              borderRadius: const BorderRadius.all(Radius.circular(12)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: context.accent),
-              borderRadius: const BorderRadius.all(Radius.circular(12)),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: context.danger),
-              borderRadius: const BorderRadius.all(Radius.circular(12)),
-            ),
-            hintText: hint,
+            enabledBorder: _border(context.line),
+            focusedBorder: _border(context.accent),
+            // Both error states are needed: without focusedErrorBorder the
+            // field falls back to the default underline while it has focus.
+            errorBorder: _border(context.danger, 1.5),
+            focusedErrorBorder: _border(context.danger, 1.5),
+            errorStyle: context.caption.copyWith(color: context.danger),
+            errorMaxLines: 2,
+            hintText: widget.hint,
             hintStyle: context.body.copyWith(
               // body's 1.5 line height pushes the hint off-centre in the field.
               height: 1.2,
@@ -82,19 +133,19 @@ class AppTextField extends StatelessWidget {
               vertical: 12,
             ),
             // Icons get exact spacing from Padding instead of the default 48px box.
-            prefixIcon: prefixIcon == null
+            prefixIcon: widget.prefixIcon == null
                 ? null
                 : Padding(
                     padding: const EdgeInsets.only(left: 14, right: 10),
-                    child: prefixIcon,
+                    child: widget.prefixIcon,
                   ),
             prefixIconConstraints: const BoxConstraints(),
             prefixIconColor: context.muted,
-            suffixIcon: suffixIcon == null
+            suffixIcon: widget.suffixIcon == null
                 ? null
                 : Padding(
                     padding: const EdgeInsets.only(left: 10, right: 14),
-                    child: suffixIcon,
+                    child: widget.suffixIcon,
                   ),
             suffixIconConstraints: const BoxConstraints(),
             suffixIconColor: context.muted,

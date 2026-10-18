@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 /// - outline: accent border and text, no fill ("Follow", "Add to calendar")
 /// - ghost: text only ("See all")
 /// - danger: solid danger, destructive actions ("Delete account")
-enum AppButtonVariant { primary, secondary, outline, ghost, danger }
+/// - dark: solid ink, the main action on auth screens ("Log in")
+enum AppButtonVariant { primary, secondary, outline, ghost, danger, dark }
 
 /// Preset heights and paddings so call sites don't pick their own numbers.
 enum AppButtonSize {
@@ -76,7 +77,9 @@ class AppButton extends StatelessWidget {
   bool get _isIconOnly => label == null;
 
   bool get _isFilled =>
-      variant == AppButtonVariant.primary || variant == AppButtonVariant.danger;
+      variant == AppButtonVariant.primary ||
+      variant == AppButtonVariant.danger ||
+      variant == AppButtonVariant.dark;
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +88,9 @@ class AppButton extends StatelessWidget {
     final child = _content(foreground);
 
     final button = switch (variant) {
-      AppButtonVariant.primary || AppButtonVariant.danger => FilledButton(
+      AppButtonVariant.primary ||
+      AppButtonVariant.danger ||
+      AppButtonVariant.dark => FilledButton(
         onPressed: onPressed,
         style: style,
         child: child,
@@ -108,7 +113,9 @@ class AppButton extends StatelessWidget {
   }
 
   Color _foreground(BuildContext context) => switch (variant) {
-    AppButtonVariant.primary || AppButtonVariant.danger => Colors.white,
+    AppButtonVariant.primary ||
+    AppButtonVariant.danger ||
+    AppButtonVariant.dark => Colors.white,
     AppButtonVariant.secondary => context.ink,
     AppButtonVariant.outline || AppButtonVariant.ghost => context.accent,
   };
@@ -116,6 +123,7 @@ class AppButton extends StatelessWidget {
   Color? _background(BuildContext context) => switch (variant) {
     AppButtonVariant.primary => context.accent,
     AppButtonVariant.danger => context.danger,
+    AppButtonVariant.dark => context.ink,
     AppButtonVariant.secondary => context.surface,
     AppButtonVariant.outline || AppButtonVariant.ghost => null, // transparent
   };

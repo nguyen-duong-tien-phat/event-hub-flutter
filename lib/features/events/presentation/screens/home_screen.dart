@@ -65,33 +65,6 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-
-                  // BODY
-                  // Padding(
-                  //   padding: const EdgeInsets.only(top: 18, bottom: 16),
-                  //   child: Text('Discover', style: context.display),
-                  // ),
-
-                  // // SEARCH
-                  // Row(
-                  //   children: [
-                  //     const Expanded(
-                  //       child: AppTextField(
-                  //         hint: 'Search events, venues, artists',
-                  //         prefixIcon: Icon(LucideIcons.search),
-                  //       ),
-                  //     ),
-
-                  //     const SizedBox(width: 10),
-
-                  //     AppButton.icon(
-                  //       tooltip: 'Filter',
-                  //       variant: AppButtonVariant.secondary,
-                  //       icon: LucideIcons.sliders,
-                  //       onPressed: () {},
-                  //     ),
-                  //   ],
-                  // ),
                 ],
               ),
             ),
