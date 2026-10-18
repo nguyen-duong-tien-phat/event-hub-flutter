@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:event_hub_mobile/core/config/env.dart';
 import 'package:event_hub_mobile/core/network/api_client.dart';
 import 'package:event_hub_mobile/core/network/token_storage.dart';
+import 'package:event_hub_mobile/features/auth/presentation/providers/auth_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'network_provider.g.dart';
@@ -29,8 +30,14 @@ Dio dio(Ref ref) {
         handler.next(options);
       },
       onError: (error, handler) async {
+        // A 401 while signed in means the session expired: sign out so the
+        // router sends the user back to Welcome. While signed out (wrong
+        // password on login, or the check at app start) there is nothing to
+        // sign out of, and Auth handles those cases itself.
         final status = error.response?.statusCode;
-        if (status == 401) await ref.read(tokenProvider).clear();
+        if (status == 401 && ref.read(authProvider).value != null) {
+          await ref.read(authProvider.notifier).logout();
+        }
         handler.next(error);
       },
     ),

@@ -1,3 +1,4 @@
+import 'package:event_hub_mobile/core/network/api_exception.dart';
 import 'package:event_hub_mobile/core/network/token_storage.dart';
 import 'package:event_hub_mobile/features/auth/data/auth_repository.dart';
 import 'package:event_hub_mobile/features/auth/data/models/user.dart';
@@ -14,8 +15,10 @@ class Auth extends _$Auth {
 
     try {
       return await ref.read(authRepositoryProvider).me();
-    } catch (_) {
+    } on UnauthorizedException {
       await ref.read(tokenProvider).clear();
+      return null;
+    } catch (_) {
       return null;
     }
   }

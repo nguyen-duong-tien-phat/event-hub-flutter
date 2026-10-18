@@ -96,6 +96,11 @@ flutter:
           weight: 600
         - asset: assets/fonts/Geist-Bold.ttf
           weight: 700
+    # Accent font for the user's name on Home (SIL Open Font License).
+    - family: InstrumentSerif
+      fonts:
+        - asset: assets/fonts/InstrumentSerif-Italic.ttf
+          style: italic
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

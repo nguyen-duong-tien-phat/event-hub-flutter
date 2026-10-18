@@ -6,6 +6,7 @@ import 'package:event_hub_mobile/features/auth/presentation/screens/signup_scree
 import 'package:event_hub_mobile/features/auth/presentation/providers/splash_provider.dart';
 import 'package:event_hub_mobile/features/auth/presentation/screens/splash_route.dart';
 import 'package:event_hub_mobile/features/auth/presentation/screens/welcome_screen.dart';
+import 'package:event_hub_mobile/features/events/presentation/screens/discover_screen.dart';
 import 'package:event_hub_mobile/features/events/presentation/screens/home_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
@@ -75,6 +76,10 @@ GoRouter appRouter(Ref ref) {
         path: AppRoutes.home,
         pageBuilder: (_, state) =>
             NoTransitionPage(key: state.pageKey, child: const HomeScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.discover,
+        builder: (_, _) => const DiscoverScreen(),
       ),
     ],
   );

@@ -6,6 +6,7 @@ abstract final class AppRoutes {
   static const forgotPassword = '/forgot-password';
   static const checkEmail = '/check-email';
   static const home = '/';
+  static const discover = '/discover';
 
   static const eventDetailPattern = '/events/:id';
   static String eventDetail(String id) => '/events/$id';
