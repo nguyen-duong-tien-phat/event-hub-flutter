@@ -1,8 +1,8 @@
+import 'package:event_hub_mobile/core/router/app_routes.dart';
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:event_hub_mobile/core/widgets/app_button.dart';
-import 'package:event_hub_mobile/features/auth/presentation/screens/login_screen.dart';
-import 'package:event_hub_mobile/features/auth/presentation/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -50,9 +50,7 @@ class WelcomeScreen extends StatelessWidget {
                     variant: AppButtonVariant.dark,
                     size: AppButtonSize.large,
                     expand: true,
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const SignupScreen()),
-                    ),
+                    onPressed: () => context.push(AppRoutes.signup),
                   ),
                   TextButton(
                     style: TextButton.styleFrom(
@@ -62,9 +60,7 @@ class WelcomeScreen extends StatelessWidget {
                         borderRadius: BorderRadius.all(Radius.circular(12)),
                       ),
                     ),
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                    ),
+                    onPressed: () => context.push(AppRoutes.login),
                     child: Text(
                       'I already have an account',
                       style: context.bodyStrong,

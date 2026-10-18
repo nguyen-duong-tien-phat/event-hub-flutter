@@ -1,10 +1,10 @@
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:event_hub_mobile/core/widgets/app_navigation_bar.dart';
+import 'package:event_hub_mobile/features/auth/presentation/providers/auth_provider.dart';
 import 'package:event_hub_mobile/features/events/presentation/providers/events_provider.dart';
 import 'package:event_hub_mobile/features/events/presentation/widgets/event_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -20,56 +20,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(_gutter, 8, _gutter, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // HEADER
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        spacing: 2,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Events near',
-                            style: context.caption.copyWith(
-                              color: context.muted,
-                            ),
-                          ),
-                          Row(
-                            spacing: 4,
-                            children: [
-                              Text(
-                                'San Francisco, US',
-                                style: context.bodyStrong,
-                              ),
-                              Icon(
-                                LucideIcons.chevronDown,
-                                size: 16,
-                                color: context.muted,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundColor: context.accent.withValues(alpha: 0.07),
-                        child: Text(
-                          'FN',
-                          style: context.link.copyWith(color: context.accent),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
+            const _Hello(),
 
             Expanded(
               child: SingleChildScrollView(
@@ -79,7 +30,19 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: _gutter),
-                      child: Text('Featured Events', style: context.headline),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Featured Events', style: context.headline),
+                          Text(
+                            'See all',
+                            style: context.meta.copyWith(
+                              color: context.muted,
+                              fontWeight: const FontWeight(500),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
 
                     const SizedBox(height: 14),
@@ -103,6 +66,38 @@ class HomeScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _Hello extends ConsumerWidget {
+  const _Hello();
+
+  String greeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.read(authProvider).value;
+    final username = user?.fullName ?? '';
+    final hello = greeting();
+
+    return Padding(
+      padding: const EdgeInsetsGeometry.symmetric(
+        vertical: 20,
+        horizontal: HomeScreen._gutter,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('$hello $username', style: context.display),
+          Text('Find something worth going out for.', style: context.bodySmall),
+        ],
       ),
     );
   }

@@ -1,15 +1,16 @@
 import 'package:event_hub_mobile/core/network/api_exception.dart';
+import 'package:event_hub_mobile/core/router/app_routes.dart';
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:event_hub_mobile/core/widgets/app_button.dart';
 import 'package:event_hub_mobile/core/widgets/app_text_field.dart';
 import 'package:event_hub_mobile/features/auth/presentation/auth_validators.dart';
 import 'package:event_hub_mobile/features/auth/presentation/providers/auth_provider.dart';
-import 'package:event_hub_mobile/features/auth/presentation/screens/login_screen.dart';
 import 'package:event_hub_mobile/features/auth/presentation/widgets/auth_back_button.dart';
 import 'package:event_hub_mobile/features/auth/presentation/widgets/auth_error.dart';
 import 'package:event_hub_mobile/features/auth/presentation/widgets/password_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -52,8 +53,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       await auth.register(_name.text.trim(), email, _password.text);
       // The backend returns no token on register, so sign in right after.
       await auth.login(email, _password.text);
-      // AuthGate now shows Home underneath: drop the auth screens on top.
-      if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
     } on ApiException catch (e) {
       if (mounted) setState(() => _error = e.message);
     } finally {
@@ -159,12 +158,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                               ),
                             ),
                             GestureDetector(
-                              onTap: () => Navigator.of(context)
-                                  .pushReplacement(
-                                    MaterialPageRoute(
-                                      builder: (_) => const LoginScreen(),
-                                    ),
-                                  ),
+                              onTap: () =>
+                                  context.pushReplacement(AppRoutes.login),
                               child: Text(
                                 'Log in',
                                 style: context.link.copyWith(

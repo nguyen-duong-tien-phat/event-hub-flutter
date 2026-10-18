@@ -1,10 +1,11 @@
+import 'package:event_hub_mobile/core/router/app_routes.dart';
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:event_hub_mobile/core/widgets/app_button.dart';
 import 'package:event_hub_mobile/core/widgets/app_text_field.dart';
 import 'package:event_hub_mobile/features/auth/presentation/auth_validators.dart';
-import 'package:event_hub_mobile/features/auth/presentation/screens/check_email_screen.dart';
 import 'package:event_hub_mobile/features/auth/presentation/widgets/auth_back_button.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -25,13 +26,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
-
-    // TODO: call the backend once it has a password-reset endpoint.
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => CheckEmailScreen(email: _email.text.trim()),
-      ),
-    );
+    context.push(AppRoutes.checkEmail, extra: _email.text.trim());
   }
 
   @override

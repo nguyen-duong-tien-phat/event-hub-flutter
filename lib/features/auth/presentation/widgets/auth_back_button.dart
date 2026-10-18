@@ -1,5 +1,7 @@
+import 'package:event_hub_mobile/core/router/app_routes.dart';
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Round back button shown at the top left of auth screens.
@@ -17,12 +19,18 @@ class AuthBackButton extends StatelessWidget {
           shape: CircleBorder(side: BorderSide(color: context.line)),
           child: InkWell(
             customBorder: const CircleBorder(),
-            onTap: () => Navigator.of(context).maybePop(),
+            onTap: () => context.canPop()
+                ? context.pop()
+                : context.go(AppRoutes.welcome),
             child: Tooltip(
               message: 'Back',
               child: SizedBox.square(
                 dimension: 40,
-                child: Icon(LucideIcons.arrowLeft, size: 18, color: context.ink),
+                child: Icon(
+                  LucideIcons.arrowLeft,
+                  size: 18,
+                  color: context.ink,
+                ),
               ),
             ),
           ),

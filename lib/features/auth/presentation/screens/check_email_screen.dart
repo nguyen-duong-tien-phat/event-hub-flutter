@@ -1,7 +1,9 @@
+import 'package:event_hub_mobile/core/router/app_routes.dart';
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:event_hub_mobile/core/widgets/app_button.dart';
 import 'package:event_hub_mobile/features/auth/presentation/widgets/auth_back_button.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class CheckEmailScreen extends StatelessWidget {
@@ -72,10 +74,7 @@ class CheckEmailScreen extends StatelessWidget {
                         variant: AppButtonVariant.dark,
                         size: AppButtonSize.large,
                         expand: true,
-                        // Stack is Login → Forgot → CheckEmail: pop twice.
-                        onPressed: () => Navigator.of(context)
-                          ..pop()
-                          ..pop(),
+                        onPressed: () => context.go(AppRoutes.login),
                       ),
                     ],
                   ),
