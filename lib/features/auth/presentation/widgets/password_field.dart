@@ -45,7 +45,10 @@ class _PasswordFieldState extends State<PasswordField> {
         onTap: () => setState(() => _obscure = !_obscure),
         child: Tooltip(
           message: _obscure ? 'Show password' : 'Hide password',
-          child: Icon(_obscure ? LucideIcons.eye : LucideIcons.eyeOff, size: 18),
+          child: Icon(
+            _obscure ? LucideIcons.eye : LucideIcons.eyeOff,
+            size: 18,
+          ),
         ),
       ),
     );

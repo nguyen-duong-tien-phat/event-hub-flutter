@@ -110,14 +110,16 @@ ApiException _fromResponse(Response? response) {
       statusCode: status,
       fieldErrors: _readFieldErrors(data),
     ),
-    401 => _readMessage(data) == null
-        ? const UnauthorizedException()
-        : UnauthorizedException(message: _readMessage(data)!),
+    401 =>
+      _readMessage(data) == null
+          ? const UnauthorizedException()
+          : UnauthorizedException(message: _readMessage(data)!),
     403 => const ForbiddenException(),
     404 => const NotFoundException(),
-    429 => _readMessage(data) == null
-        ? const TooManyRequestException()
-        : TooManyRequestException(message: _readMessage(data)!),
+    429 =>
+      _readMessage(data) == null
+          ? const TooManyRequestException()
+          : TooManyRequestException(message: _readMessage(data)!),
     final code? when code >= 500 => ServerException(statusCode: code),
     _ => UnknownException(statusCode: status),
   };

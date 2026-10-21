@@ -49,8 +49,7 @@ class _AppLoadingState extends State<AppLoading>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: _cycle)
-      ..repeat();
+    _controller = AnimationController(vsync: this, duration: _cycle)..repeat();
     if (widget.finishing) _finish();
   }
 

@@ -1,4 +1,5 @@
 import 'package:event_hub_mobile/features/events/data/event_repository.dart';
+import 'package:event_hub_mobile/features/events/data/models/event.dart';
 import 'package:event_hub_mobile/features/events/data/models/event_summary.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -16,5 +17,11 @@ Future<List<EventSummary>> upcomingEvents(Ref ref) async {
       .watch(eventRepositoryProvider)
       .getUpcomingEvents(5);
 
+  return response;
+}
+
+@riverpod
+Future<Event> eventDetail(Ref ref, String id) async {
+  final response = await ref.watch(eventRepositoryProvider).getEventById(id);
   return response;
 }

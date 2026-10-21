@@ -2,9 +2,16 @@ class Organizer {
   final String id;
   final String fullName;
 
-  const Organizer({required this.id, required this.fullName});
+  /// Contact email. The backend only sends it with the event detail.
+  final String? email;
 
-  factory fromJson(Map<String, dynamic> json) {
-    return Organizer(id: json['id'], fullName: json['fullName']);
+  const Organizer({required this.id, required this.fullName, this.email});
+
+  factory Organizer.fromJson(Map<String, dynamic> json) {
+    return Organizer(
+      id: json['id'],
+      fullName: json['fullName'],
+      email: json['email'] as String?,
+    );
   }
 }

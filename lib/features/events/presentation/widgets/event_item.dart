@@ -1,8 +1,10 @@
+import 'package:event_hub_mobile/core/router/app_routes.dart';
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:event_hub_mobile/core/widgets/skeleton.dart';
 import 'package:event_hub_mobile/core/widgets/skeleton_pulse.dart';
 import 'package:event_hub_mobile/features/events/data/models/event_summary.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 enum EventItemVariant { featured, compact }
@@ -32,8 +34,9 @@ class EventItem extends StatelessWidget {
       );
     }
 
+    final Widget body;
     if (variant == EventItemVariant.featured) {
-      return SizedBox(
+      body = SizedBox(
         width: 280,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,50 +107,55 @@ class EventItem extends StatelessWidget {
           ],
         ),
       );
+    } else {
+      body = Row(
+        spacing: 14,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              event.imageUrl,
+              fit: BoxFit.cover,
+              height: 64,
+              width: 64,
+              alignment: Alignment.bottomCenter,
+            ),
+          ),
+
+          Expanded(
+            child: Column(
+              spacing: 3,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${event.date} · ${event.time}',
+                  style: context.dateLine.copyWith(color: context.accent),
+                ),
+                Text(
+                  event.title,
+                  style: context.bodyStrong,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+                Text(
+                  event.organizer.fullName,
+                  style: context.meta.copyWith(color: context.muted),
+                ),
+              ],
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Icon(LucideIcons.heart, size: 20, color: context.muted),
+          ),
+        ],
+      );
     }
 
-    return Row(
-      spacing: 14,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Image.network(
-            event.imageUrl,
-            fit: BoxFit.cover,
-            height: 64,
-            width: 64,
-            alignment: Alignment.bottomCenter,
-          ),
-        ),
-
-        Expanded(
-          child: Column(
-            spacing: 3,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${event.date} · ${event.time}',
-                style: context.dateLine.copyWith(color: context.accent),
-              ),
-              Text(
-                event.title,
-                style: context.bodyStrong,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-              Text(
-                event.organizer.fullName,
-                style: context.meta.copyWith(color: context.muted),
-              ),
-            ],
-          ),
-        ),
-
-        Padding(
-          padding: const EdgeInsets.all(8),
-          child: Icon(LucideIcons.heart, size: 20, color: context.muted),
-        ),
-      ],
+    return GestureDetector(
+      child: body,
+      onTap: () => context.push(AppRoutes.eventDetail(event.id)),
     );
   }
 }

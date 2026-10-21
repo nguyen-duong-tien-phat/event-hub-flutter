@@ -9,6 +9,9 @@ class EventSummary {
   final String imageUrl;
   final Organizer organizer;
 
+  /// For example "Concert"; empty if the backend did not send one.
+  final String category;
+
   const EventSummary({
     required this.id,
     required this.title,
@@ -16,6 +19,7 @@ class EventSummary {
     required this.startsAt,
     required this.location,
     required this.imageUrl,
+    this.category = '',
   });
 
   factory fromJson(Map<String, dynamic> json) {
@@ -26,6 +30,7 @@ class EventSummary {
       startsAt: DateTime.parse(json['startsAt']),
       location: json['location'],
       imageUrl: json['imageUrl'],
+      category: json['category'] as String? ?? '',
     );
   }
 

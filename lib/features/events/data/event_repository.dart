@@ -1,6 +1,7 @@
 import 'package:event_hub_mobile/core/network/api_client.dart';
 import 'package:event_hub_mobile/core/network/network_provider.dart';
 import 'package:event_hub_mobile/core/network/paginated_response.dart';
+import 'package:event_hub_mobile/features/events/data/models/event.dart';
 import 'package:event_hub_mobile/features/events/data/models/event_summary.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -51,6 +52,13 @@ class EventRepository {
       parser: (json) => (json as List)
           .map((event) => EventSummary.fromJson(event as Map<String, dynamic>))
           .toList(),
+    );
+  }
+
+  Future<Event> getEventById(String id) {
+    return _apiClient.get(
+      '/events/$id',
+      parser: (json) => Event.fromJson(json as Map<String, dynamic>),
     );
   }
 }

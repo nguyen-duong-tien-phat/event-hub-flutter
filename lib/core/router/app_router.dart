@@ -7,6 +7,7 @@ import 'package:event_hub_mobile/features/auth/presentation/providers/splash_pro
 import 'package:event_hub_mobile/features/auth/presentation/screens/splash_route.dart';
 import 'package:event_hub_mobile/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:event_hub_mobile/features/events/presentation/screens/discover_screen.dart';
+import 'package:event_hub_mobile/features/events/presentation/screens/event_detail_screen.dart';
 import 'package:event_hub_mobile/features/events/presentation/screens/home_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
@@ -80,6 +81,11 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.discover,
         builder: (_, _) => const DiscoverScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.eventDetailPattern,
+        builder: (_, state) =>
+            EventDetailScreen(id: state.pathParameters['id']!),
       ),
     ],
   );
