@@ -16,9 +16,18 @@ class BookingRepository {
 
   /// Holds the tickets and starts the payment. [quantities] maps ticket id to
   /// how many of that ticket. The result carries the Stripe client secret.
-  Future<Booking> create(String eventId, Map<String, int> quantities) {
+  ///
+  /// [idempotencyKey] identifies one intent to book. Sending the same key again
+  /// (a double tap, a retry after a network error) returns the original booking
+  /// instead of holding the tickets twice.
+  Future<Booking> create(
+    String eventId,
+    Map<String, int> quantities, {
+    required String idempotencyKey,
+  }) {
     return _apiClient.post(
       '/bookings',
+      headers: {'Idempotency-Key': idempotencyKey},
       data: {
         'eventId': eventId,
         'tickets': [

@@ -42,10 +42,16 @@ class ApiClient {
     String path, {
     Map<String, dynamic>? queryParameters,
     dynamic data,
+    Map<String, dynamic>? headers,
     T Function(dynamic json)? parser,
   }) async {
     return _send(
-      () => _dio.post(path, queryParameters: queryParameters, data: data),
+      () => _dio.post(
+        path,
+        queryParameters: queryParameters,
+        data: data,
+        options: headers == null ? null : Options(headers: headers),
+      ),
       parser,
     );
   }

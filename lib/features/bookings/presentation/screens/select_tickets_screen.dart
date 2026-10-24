@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:uuid/uuid.dart';
 
 /// Pick how many of each ticket type, then hold them and go to checkout.
 class SelectTicketsScreen extends ConsumerWidget {
@@ -84,6 +85,10 @@ class _Picker extends ConsumerStatefulWidget {
 class _PickerState extends ConsumerState<_Picker> {
   /// Ticket id -> how many.
   final Map<String, int> _quantities = {};
+
+  /// One key per intent to book. Kept while the user retries the same choice,
+  /// replaced when they change it or once the booking is made.
+  String? _idempotencyKey;
   bool _isLoading = false;
 
   int get _count => _quantities.values.fold(0, (a, b) => a + b);
@@ -97,6 +102,7 @@ class _PickerState extends ConsumerState<_Picker> {
       math.min(ticket.maxPerOrder, ticket.remainingQuantity);
 
   void _set(Ticket ticket, int quantity) {
+    _idempotencyKey = null; // a different choice is a different intent
     setState(() {
       if (quantity <= 0) {
         _quantities.remove(ticket.id);
@@ -113,7 +119,12 @@ class _PickerState extends ConsumerState<_Picker> {
     try {
       final booking = await ref
           .read(bookingRepositoryProvider)
-          .create(widget.event.id, _quantities);
+          .create(
+            widget.event.id,
+            _quantities,
+            idempotencyKey: _idempotencyKey ??= const Uuid().v4(),
+          );
+      _idempotencyKey = null; // done: the next booking is a new intent
       final secret = booking.clientSecret;
       if (secret != null) {
         ref.read(paymentSecretsProvider.notifier).put(booking.id, secret);
