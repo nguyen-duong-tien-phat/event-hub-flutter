@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:event_hub_mobile/core/network/api_exception.dart';
 import 'package:event_hub_mobile/core/router/app_routes.dart';
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
+import 'package:event_hub_mobile/core/utils/money.dart';
 import 'package:event_hub_mobile/core/widgets/app_button.dart';
 import 'package:event_hub_mobile/core/widgets/bottom_action_bar.dart';
 import 'package:event_hub_mobile/core/widgets/message_state.dart';
@@ -11,10 +12,10 @@ import 'package:event_hub_mobile/core/widgets/skeleton_pulse.dart';
 import 'package:event_hub_mobile/features/events/data/models/event.dart';
 import 'package:event_hub_mobile/features/events/presentation/providers/events_provider.dart';
 import 'package:event_hub_mobile/features/events/presentation/widgets/event_detail/event_sheet.dart';
+import 'package:event_hub_mobile/features/saved/presentation/widgets/heart_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const double _gutter = 20;
@@ -81,17 +82,21 @@ class _Content extends StatelessWidget {
             ),
           ),
         ),
-        const Positioned(
+        Positioned(
           top: 0,
           left: 0,
           right: 0,
-          child: _TopBar(showActions: true),
+          child: _TopBar(eventId: event.id),
         ),
         Positioned(
           bottom: 0,
           left: 0,
           right: 0,
-          child: _BottomBar(cheapestPrice: cheapest, soldOut: soldOut),
+          child: _BottomBar(
+            eventId: event.id,
+            cheapestPrice: cheapest,
+            soldOut: soldOut,
+          ),
         ),
       ],
     );
@@ -122,10 +127,11 @@ class _Hero extends StatelessWidget {
 
 /// Back / share / save buttons floating over the photo.
 class _TopBar extends StatelessWidget {
-  const _TopBar({required this.showActions});
+  const _TopBar({this.eventId});
 
-  /// Share and save are hidden while the event is loading.
-  final bool showActions;
+  /// Share and save are shown for this event. Null while it is loading or
+  /// failed to load.
+  final String? eventId;
 
   @override
   Widget build(BuildContext context) {
@@ -141,13 +147,16 @@ class _TopBar extends StatelessWidget {
               tooltip: 'Back',
               onTap: () => _goBack(context),
             ),
-            if (showActions)
-              // TODO: wire up sharing and saving.
-              const Row(
+            if (eventId != null)
+              Row(
                 spacing: 8,
                 children: [
-                  _CircleButton(icon: LucideIcons.share, tooltip: 'Share'),
-                  _CircleButton(icon: LucideIcons.heart, tooltip: 'Save'),
+                  // TODO: wire up sharing.
+                  const _CircleButton(
+                    icon: LucideIcons.share,
+                    tooltip: 'Share',
+                  ),
+                  HeartButton.onPhoto(eventId: eventId!, size: 40),
                 ],
               ),
           ],
@@ -189,14 +198,15 @@ void _goBack(BuildContext context) =>
 
 /// The event detail's bottom bar: cheapest ticket price and "Get tickets".
 class _BottomBar extends StatelessWidget {
-  const _BottomBar({required this.cheapestPrice, required this.soldOut});
+  const _BottomBar({
+    required this.eventId,
+    required this.cheapestPrice,
+    required this.soldOut,
+  });
 
+  final String eventId;
   final double? cheapestPrice;
   final bool soldOut;
-
-  String _price(double price) => price == 0
-      ? 'Free'
-      : NumberFormat.currency(symbol: r'$', decimalDigits: 2).format(price);
 
   @override
   Widget build(BuildContext context) {
@@ -208,10 +218,11 @@ class _BottomBar extends StatelessWidget {
               'Tickets not on sale yet',
               style: context.bodySmall.copyWith(color: context.muted),
             )
-          : BottomBarLabel(caption: 'From', value: _price(price)),
+          : BottomBarLabel(caption: 'From', value: formatPrice(price)),
       actionLabel: soldOut ? 'Sold out' : 'Get tickets',
-      // TODO: open the ticket selection screen.
-      onPressed: soldOut || price == null ? null : () {},
+      onPressed: soldOut || price == null
+          ? null
+          : () => context.push(AppRoutes.selectTickets(eventId)),
     );
   }
 }
@@ -227,7 +238,7 @@ class _ErrorState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const _TopBar(showActions: false),
+        const _TopBar(),
         Expanded(
           child: notFound
               ? MessageState(
@@ -328,12 +339,7 @@ class _Skeleton extends StatelessWidget {
           ),
         ),
         // Leaving is always possible, even while loading.
-        const Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: _TopBar(showActions: false),
-        ),
+        const Positioned(top: 0, left: 0, right: 0, child: _TopBar()),
       ],
     );
   }

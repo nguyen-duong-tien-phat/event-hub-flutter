@@ -4,25 +4,27 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 typedef NavTab = ({IconData icon, String label});
 
-class AppNavigationBar extends StatefulWidget {
-  const new({super.key});
+/// Bottom bar of the main tabs. It only shows [currentIndex] and reports
+/// taps; the router decides what each tab opens.
+class AppNavigationBar extends StatelessWidget {
+  const AppNavigationBar({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
 
-  @override
-  State<AppNavigationBar> createState() => _AppNavigationBarState();
-}
+  static const List<NavTab> tabs = [
+    (icon: LucideIcons.house, label: 'Home'),
+    (icon: LucideIcons.ticket, label: 'Tickets'),
+    (icon: LucideIcons.heart, label: 'Saved'),
+    (icon: LucideIcons.userRound, label: 'Profile'),
+  ];
 
-class _AppNavigationBarState extends State<AppNavigationBar> {
-  int selectedIndex = 0;
+  final int currentIndex;
+  final ValueChanged<int> onTap;
 
   @override
   Widget build(BuildContext context) {
-    const List<NavTab> tabs = [
-      (icon: LucideIcons.compass, label: 'Discover'),
-      (icon: LucideIcons.ticket, label: 'Tickets'),
-      (icon: LucideIcons.heart, label: 'Saved'),
-      (icon: LucideIcons.userRound, label: 'Profile'),
-    ];
-
     // Material (not Container color) paints the background, so the
     // InkWell ripple shows on top of it instead of underneath.
     return Material(
@@ -44,10 +46,8 @@ class _AppNavigationBarState extends State<AppNavigationBar> {
                   child: _Tab(
                     icon: tab.icon,
                     label: tab.label,
-                    selected: i == selectedIndex,
-                    onTap: () => setState(() {
-                      selectedIndex = i;
-                    }),
+                    selected: i == currentIndex,
+                    onTap: () => onTap(i),
                   ),
                 ),
             ],
@@ -59,21 +59,22 @@ class _AppNavigationBarState extends State<AppNavigationBar> {
 }
 
 class _Tab extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool selected;
-  final GestureTapCallback onTap;
-
-  const new({
+  const _Tab({
     required this.icon,
     required this.label,
     required this.selected,
     required this.onTap,
   });
 
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final GestureTapCallback onTap;
+
   @override
   Widget build(BuildContext context) {
-    Color color = selected ? context.ink : context.muted;
+    final color = selected ? context.ink : context.muted;
+
     return InkWell(
       onTap: onTap,
       child: Padding(

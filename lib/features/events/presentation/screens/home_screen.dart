@@ -1,7 +1,6 @@
 import 'package:event_hub_mobile/core/router/app_routes.dart';
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:event_hub_mobile/core/widgets/app_button.dart';
-import 'package:event_hub_mobile/core/widgets/app_navigation_bar.dart';
 import 'package:event_hub_mobile/core/widgets/message_state.dart';
 import 'package:event_hub_mobile/features/auth/presentation/providers/auth_provider.dart';
 import 'package:event_hub_mobile/features/events/data/models/event_summary.dart';
@@ -68,7 +67,6 @@ class HomeScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      bottomNavigationBar: const AppNavigationBar(),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

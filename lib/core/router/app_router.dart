@@ -6,10 +6,21 @@ import 'package:event_hub_mobile/features/auth/presentation/screens/signup_scree
 import 'package:event_hub_mobile/features/auth/presentation/providers/splash_provider.dart';
 import 'package:event_hub_mobile/features/auth/presentation/screens/splash_route.dart';
 import 'package:event_hub_mobile/features/auth/presentation/screens/welcome_screen.dart';
+import 'package:event_hub_mobile/features/bookings/presentation/screens/checkout_screen.dart';
+import 'package:event_hub_mobile/features/bookings/presentation/screens/order_success_screen.dart';
+import 'package:event_hub_mobile/features/bookings/presentation/screens/payment_failed_screen.dart';
+import 'package:event_hub_mobile/features/bookings/presentation/screens/payment_screen.dart';
+import 'package:event_hub_mobile/features/bookings/presentation/screens/select_tickets_screen.dart';
+import 'package:event_hub_mobile/core/router/app_shell.dart';
+import 'package:event_hub_mobile/features/bookings/presentation/screens/my_tickets_screen.dart';
+import 'package:event_hub_mobile/features/bookings/presentation/screens/ticket_detail_screen.dart';
+import 'package:event_hub_mobile/features/profile/presentation/screens/profile_screen.dart';
+import 'package:event_hub_mobile/features/saved/presentation/screens/saved_screen.dart';
 import 'package:event_hub_mobile/features/events/presentation/screens/discover_screen.dart';
 import 'package:event_hub_mobile/features/events/presentation/screens/event_detail_screen.dart';
 import 'package:event_hub_mobile/features/events/presentation/screens/home_screen.dart';
-import 'package:flutter/foundation.dart';
+import 'package:event_hub_mobile/features/events/presentation/screens/search_screen.dart';
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:event_hub_mobile/core/router/app_routes.dart';
@@ -73,15 +84,65 @@ GoRouter appRouter(Ref ref) {
         builder: (_, state) =>
             CheckEmailScreen(email: (state.extra as String?) ?? ''),
       ),
+      // The four main tabs share one bottom bar and keep their own state.
+      StatefulShellRoute.indexedStack(
+        builder: (_, _, shell) => AppShell(shell: shell),
+        branches: [
+          for (final (path, screen) in <(String, Widget)>[
+            (AppRoutes.home, const HomeScreen()),
+            (AppRoutes.tickets, const MyTicketsScreen()),
+            (AppRoutes.saved, const SavedScreen()),
+            (AppRoutes.profile, const ProfileScreen()),
+          ])
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: path,
+                  // Switching tabs should not slide.
+                  pageBuilder: (_, state) =>
+                      NoTransitionPage(key: state.pageKey, child: screen),
+                ),
+              ],
+            ),
+        ],
+      ),
       GoRoute(
-        path: AppRoutes.home,
-        pageBuilder: (_, state) =>
-            NoTransitionPage(key: state.pageKey, child: const HomeScreen()),
+        path: AppRoutes.ticketDetailPattern,
+        builder: (_, state) =>
+            TicketDetailScreen(bookingId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: AppRoutes.selectTicketsPattern,
+        builder: (_, state) =>
+            SelectTicketsScreen(eventId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: AppRoutes.checkoutPattern,
+        builder: (_, state) =>
+            CheckoutScreen(bookingId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: AppRoutes.paymentPattern,
+        builder: (_, state) =>
+            PaymentScreen(bookingId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: AppRoutes.orderSuccessPattern,
+        builder: (_, state) =>
+            OrderSuccessScreen(bookingId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: AppRoutes.paymentFailedPattern,
+        builder: (_, state) => PaymentFailedScreen(
+          bookingId: state.pathParameters['id']!,
+          reason: state.extra as String?,
+        ),
       ),
       GoRoute(
         path: AppRoutes.discover,
         builder: (_, _) => const DiscoverScreen(),
       ),
+      GoRoute(path: AppRoutes.search, builder: (_, _) => const SearchScreen()),
       GoRoute(
         path: AppRoutes.eventDetailPattern,
         builder: (_, state) =>

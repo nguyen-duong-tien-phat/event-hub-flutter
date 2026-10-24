@@ -1,4 +1,5 @@
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
+import 'package:event_hub_mobile/core/widgets/app_navigation_bar.dart';
 import 'package:event_hub_mobile/features/auth/presentation/providers/auth_provider.dart';
 import 'package:event_hub_mobile/features/auth/presentation/providers/splash_provider.dart';
 import 'package:event_hub_mobile/features/auth/presentation/screens/splash_screen.dart';
@@ -65,7 +66,15 @@ class _SplashRouteState extends ConsumerState<SplashRoute>
 
     // What the router will show next.
     final Widget target = auth.value != null
-        ? const HomeScreen()
+        // The same frame the Home tab has once the router takes over, so the
+        // bottom bar does not pop in at the end of the reveal.
+        ? Scaffold(
+            body: const HomeScreen(),
+            bottomNavigationBar: AppNavigationBar(
+              currentIndex: 0,
+              onTap: (_) {},
+            ),
+          )
         : const WelcomeScreen();
 
     // Splash and overlay share one Stack so the Splash keeps animating
