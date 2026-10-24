@@ -6,4 +6,8 @@ class Env {
     'API_BASE_URL',
     defaultValue: 'http://localhost:8080',
   );
+
+  static const stripePublishableKey = String.fromEnvironment(
+    'STRIPE_PUBLISHABLE_KEY',
+  );
 }
