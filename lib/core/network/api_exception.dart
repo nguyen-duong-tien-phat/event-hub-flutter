@@ -64,3 +64,9 @@ class TooManyRequestException extends ApiException {
     super.message = 'Too many requests. Please try again later.',
   }) : super(statusCode: 429);
 }
+
+/// The request clashes with the current state, e.g. not enough tickets left.
+class ConflictException extends ApiException {
+  const ConflictException({super.message = 'That is no longer available.'})
+    : super(statusCode: 409);
+}

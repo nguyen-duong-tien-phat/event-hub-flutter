@@ -10,15 +10,21 @@ import 'package:flutter/material.dart';
 class BottomActionBar extends StatelessWidget {
   const BottomActionBar({
     super.key,
-    required this.leading,
+    this.leading,
+    this.above,
     required this.actionLabel,
     required this.onPressed,
     this.actionWidth = 190,
     this.variant = AppButtonVariant.primary,
+    this.isLoading = false,
   });
 
-  /// Fills the space left of the button.
-  final Widget leading;
+  /// Fills the space left of the button. Without it the button takes the whole
+  /// width.
+  final Widget? leading;
+
+  /// Small note over the row, e.g. "Payments are encrypted and secure".
+  final Widget? above;
 
   final String actionLabel;
 
@@ -27,6 +33,9 @@ class BottomActionBar extends StatelessWidget {
 
   final double actionWidth;
   final AppButtonVariant variant;
+
+  /// Shows a spinner in the button and blocks taps.
+  final bool isLoading;
 
   static const double _gutter = 20;
 
@@ -43,19 +52,20 @@ class BottomActionBar extends StatelessWidget {
         minimum: const EdgeInsets.only(bottom: 14),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(_gutter, 14, _gutter, 0),
-          child: Row(
-            spacing: 16,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 10,
             children: [
-              Expanded(child: leading),
-              SizedBox(
-                width: actionWidth,
-                child: AppButton(
-                  label: actionLabel,
-                  variant: variant,
-                  size: AppButtonSize.large,
-                  expand: true,
-                  onPressed: onPressed,
-                ),
+              ?above,
+              Row(
+                spacing: 16,
+                children: [
+                  if (leading != null) Expanded(child: leading!),
+                  if (leading == null)
+                    Expanded(child: _button())
+                  else
+                    SizedBox(width: actionWidth, child: _button()),
+                ],
               ),
             ],
           ),
@@ -63,6 +73,15 @@ class BottomActionBar extends StatelessWidget {
       ),
     );
   }
+
+  Widget _button() => AppButton(
+    label: actionLabel,
+    variant: variant,
+    size: AppButtonSize.large,
+    expand: true,
+    isLoading: isLoading,
+    onPressed: onPressed,
+  );
 }
 
 /// Small caption over a larger value, e.g. "From" over "$25.00" or

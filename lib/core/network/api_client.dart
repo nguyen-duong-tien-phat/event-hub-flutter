@@ -62,6 +62,18 @@ class ApiClient {
     );
   }
 
+  Future<T> patch<T>(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    dynamic data,
+    T Function(dynamic json)? parser,
+  }) async {
+    return _send(
+      () => _dio.patch(path, queryParameters: queryParameters, data: data),
+      parser,
+    );
+  }
+
   Future<T> delete<T>(
     String path, {
     Map<String, dynamic>? queryParameters,
@@ -116,6 +128,10 @@ ApiException _fromResponse(Response? response) {
           : UnauthorizedException(message: _readMessage(data)!),
     403 => const ForbiddenException(),
     404 => const NotFoundException(),
+    409 =>
+      _readMessage(data) == null
+          ? const ConflictException()
+          : ConflictException(message: _readMessage(data)!),
     429 =>
       _readMessage(data) == null
           ? const TooManyRequestException()
