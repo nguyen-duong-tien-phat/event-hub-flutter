@@ -3,9 +3,9 @@ import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:event_hub_mobile/core/widgets/skeleton.dart';
 import 'package:event_hub_mobile/core/widgets/skeleton_pulse.dart';
 import 'package:event_hub_mobile/features/events/data/models/event_summary.dart';
+import 'package:event_hub_mobile/features/saved/presentation/widgets/heart_button.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 enum EventItemVariant { featured, compact }
 
@@ -15,10 +15,14 @@ class EventItem extends StatelessWidget {
   /// Null when this item is a loading skeleton.
   final EventSummary? event;
 
+  /// Show "From $25.00" under the title (compact variant).
+  final bool showPrice;
+
   const new({
     super.key,
     required this.event,
     this.variant = EventItemVariant.compact,
+    this.showPrice = false,
   });
 
   @override
@@ -51,6 +55,12 @@ class EventItem extends StatelessWidget {
                     height: 180,
                     width: 280,
                     alignment: Alignment.bottomCenter,
+                    // A grey block instead of an error when the photo fails.
+                    errorBuilder: (context, error, stackTrace) => SizedBox(
+                      width: 280,
+                      height: 180,
+                      child: ColoredBox(color: context.line),
+                    ),
                   ),
                 ),
                 Positioned(
@@ -82,16 +92,7 @@ class EventItem extends StatelessWidget {
                 Positioned(
                   right: 12,
                   top: 12,
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: context.surface,
-                      borderRadius: BorderRadius.circular(99),
-                    ),
-                    alignment: Alignment.center,
-                    child: const Icon(LucideIcons.heart, size: 18),
-                  ),
+                  child: HeartButton.onPhoto(eventId: event.id),
                 ),
               ],
             ),
@@ -119,6 +120,10 @@ class EventItem extends StatelessWidget {
               height: 64,
               width: 64,
               alignment: Alignment.bottomCenter,
+              errorBuilder: (context, error, stackTrace) => SizedBox.square(
+                dimension: 64,
+                child: ColoredBox(color: context.line),
+              ),
             ),
           ),
 
@@ -141,14 +146,16 @@ class EventItem extends StatelessWidget {
                   event.organizer.fullName,
                   style: context.meta.copyWith(color: context.muted),
                 ),
+                if (showPrice && event.priceLabel != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(event.priceLabel!, style: context.metaStrong),
+                  ),
               ],
             ),
           ),
 
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Icon(LucideIcons.heart, size: 20, color: context.muted),
-          ),
+          HeartButton(eventId: event.id),
         ],
       );
     }

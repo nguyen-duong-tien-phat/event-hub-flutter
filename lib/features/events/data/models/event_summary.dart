@@ -1,3 +1,4 @@
+import 'package:event_hub_mobile/core/utils/money.dart';
 import 'package:event_hub_mobile/features/auth/data/models/organizer.dart';
 import 'package:intl/intl.dart';
 
@@ -12,6 +13,9 @@ class EventSummary {
   /// For example "Concert"; empty if the backend did not send one.
   final String category;
 
+  /// Price of the cheapest ticket, or null when the event has none.
+  final double? minPrice;
+
   const EventSummary({
     required this.id,
     required this.title,
@@ -20,6 +24,7 @@ class EventSummary {
     required this.location,
     required this.imageUrl,
     this.category = '',
+    this.minPrice,
   });
 
   factory fromJson(Map<String, dynamic> json) {
@@ -31,7 +36,15 @@ class EventSummary {
       location: json['location'],
       imageUrl: json['imageUrl'],
       category: json['category'] as String? ?? '',
+      minPrice: (json['minPrice'] as num?)?.toDouble(),
     );
+  }
+
+  /// "Free" or "From $25.00"; null when the price is unknown.
+  String? get priceLabel {
+    final price = minPrice;
+    if (price == null) return null;
+    return price == 0 ? 'Free' : 'From ${formatMoney(price)}';
   }
 
   String get time => DateFormat('Hm').format(startsAt);
