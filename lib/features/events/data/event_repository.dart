@@ -18,15 +18,21 @@ class EventRepository {
     DateTime? from,
     DateTime? to,
     String? search,
+    String? category,
+    double? minPrice,
+    double? maxPrice,
   }) {
     return _apiClient.get(
       '/events',
       queryParameters: {
         'page': page,
         'pageSize': pageSize,
-        if (from != null) 'from': from.toIso8601String(),
-        if (to != null) 'to': to.toIso8601String(),
+        if (from != null) 'from': from.toUtc().toIso8601String(),
+        if (to != null) 'to': to.toUtc().toIso8601String(),
         if (search != null && search.isNotEmpty) 'search': search,
+        'category': ?category,
+        'minPrice': ?minPrice,
+        'maxPrice': ?maxPrice,
       },
       parser: (json) => PaginatedResponse.fromJson(
         json as Map<String, dynamic>,
