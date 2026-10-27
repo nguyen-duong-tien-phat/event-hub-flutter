@@ -35,25 +35,30 @@ const eventCategories = [
 /// What the user narrowed the event list down to. Immutable, and equal when
 /// the choices are equal, so it can key a provider.
 class EventFilters {
-  const EventFilters({this.date, this.price, this.category});
+  const EventFilters({this.date, this.day, this.price, this.category});
 
   final DateFilter? date;
+
+  /// A single day picked on the calendar. Replaces [date], never used with it.
+  final DateTime? day;
   final PriceFilter? price;
   final String? category;
 
   /// How many filters are on.
-  int get count => [date, price, category].where((f) => f != null).length;
+  int get count => [date, day, price, category].where((f) => f != null).length;
 
   bool get isEmpty => count == 0;
 
   /// Each argument replaces the current choice; pass null to turn it off.
   EventFilters copyWith({
     DateFilter? Function()? date,
+    DateTime? Function()? day,
     PriceFilter? Function()? price,
     String? Function()? category,
   }) {
     return EventFilters(
       date: date != null ? date() : this.date,
+      day: day != null ? day() : this.day,
       price: price != null ? price() : this.price,
       category: category != null ? category() : this.category,
     );
@@ -65,6 +70,13 @@ class EventFilters {
     final today = DateTime(now.year, now.month, now.day);
     DateTime endOf(DateTime day) =>
         DateTime(day.year, day.month, day.day, 23, 59, 59);
+
+    final picked = day;
+    if (picked != null) {
+      final start = DateTime(picked.year, picked.month, picked.day);
+      // Today is only what is still ahead; other days start at midnight.
+      return (from: start.isBefore(now) ? now : start, to: endOf(start));
+    }
 
     switch (date) {
       case null:
@@ -94,9 +106,10 @@ class EventFilters {
   bool operator ==(Object other) =>
       other is EventFilters &&
       other.date == date &&
+      other.day == day &&
       other.price == price &&
       other.category == category;
 
   @override
-  int get hashCode => Object.hash(date, price, category);
+  int get hashCode => Object.hash(date, day, price, category);
 }

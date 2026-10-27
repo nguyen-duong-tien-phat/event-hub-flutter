@@ -176,7 +176,7 @@ class EventList extends StatelessWidget {
           ]
         else
           for (final event in events) ...[
-            EventItem(event: event, showPrice: true),
+            EventItem(event: event, showPrice: true, showVenue: true),
             const SizedBox(height: 18),
           ],
       ],

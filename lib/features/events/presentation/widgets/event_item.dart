@@ -18,11 +18,15 @@ class EventItem extends StatelessWidget {
   /// Show "From $25.00" under the title (compact variant).
   final bool showPrice;
 
+  /// Show the venue under the title instead of the organizer (compact variant).
+  final bool showVenue;
+
   const new({
     super.key,
     required this.event,
     this.variant = EventItemVariant.compact,
     this.showPrice = false,
+    this.showVenue = false,
   });
 
   @override
@@ -143,8 +147,10 @@ class EventItem extends StatelessWidget {
                   maxLines: 1,
                 ),
                 Text(
-                  event.organizer.fullName,
+                  showVenue ? event.location : event.organizer.fullName,
                   style: context.meta.copyWith(color: context.muted),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
                 if (showPrice && event.priceLabel != null)
                   Padding(

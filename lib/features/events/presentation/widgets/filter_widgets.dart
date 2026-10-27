@@ -3,7 +3,9 @@ import 'package:event_hub_mobile/core/widgets/bottom_action_bar.dart';
 import 'package:event_hub_mobile/features/events/data/models/event_filters.dart';
 import 'package:event_hub_mobile/features/events/presentation/providers/discover_providers.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// A rounded chip that is filled dark when [selected].
 class FilterChipButton extends StatelessWidget {
@@ -191,6 +193,20 @@ class FiltersSheet extends ConsumerStatefulWidget {
 class _FiltersSheetState extends ConsumerState<FiltersSheet> {
   late EventFilters _draft = ref.read(discoverFiltersProvider);
 
+  Future<void> _pickDay() async {
+    final today = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _draft.day ?? today,
+      firstDate: DateTime(today.year, today.month, today.day),
+      lastDate: today.add(const Duration(days: 365)),
+    );
+    if (picked == null || !mounted) return;
+    setState(
+      () => _draft = _draft.copyWith(date: () => null, day: () => picked),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // How many events the draft would show, so the button can say so.
@@ -205,10 +221,15 @@ class _FiltersSheetState extends ConsumerState<FiltersSheet> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                IconButton(
+                  tooltip: 'Close',
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: Icon(LucideIcons.x, size: 20, color: context.ink),
+                ),
                 Text('Filters', style: context.subhead),
                 TextButton(
                   onPressed: _draft.isEmpty
@@ -231,7 +252,7 @@ class _FiltersSheetState extends ConsumerState<FiltersSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 24,
                 children: [
-                  _Group('When', [
+                  _Group('Date', [
                     for (final d in DateFilter.values)
                       FilterChipButton(
                         label: d.label,
@@ -239,9 +260,17 @@ class _FiltersSheetState extends ConsumerState<FiltersSheet> {
                         onTap: () => setState(
                           () => _draft = _draft.copyWith(
                             date: () => _draft.date == d ? null : d,
+                            day: () => null,
                           ),
                         ),
                       ),
+                    FilterChipButton(
+                      label: _draft.day == null
+                          ? 'Pick a date'
+                          : DateFormat('E d MMM').format(_draft.day!),
+                      selected: _draft.day != null,
+                      onTap: _pickDay,
+                    ),
                   ]),
                   _Group('Price', [
                     for (final p in PriceFilter.values)
@@ -298,10 +327,7 @@ class _Group extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 12,
       children: [
-        Text(
-          title.toUpperCase(),
-          style: context.overline.copyWith(color: context.muted),
-        ),
+        Text(title, style: context.link.copyWith(color: context.ink)),
         Wrap(spacing: 8, runSpacing: 8, children: chips),
       ],
     );
