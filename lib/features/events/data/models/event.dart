@@ -50,5 +50,5 @@ class Event extends EventSummary {
   }
 
   static DateTime? _date(Object? value) =>
-      value == null ? null : DateTime.parse(value as String);
+      value == null ? null : DateTime.parse(value as String).toLocal();
 }
