@@ -32,6 +32,14 @@ class Auth extends _$Auth {
     return ref.read(authRepositoryProvider).register(fullName, email, password);
   }
 
+  /// The server refused the session (the refresh token is gone or expired).
+  /// Unlike [logout] it does not call the server: that call would fail the same
+  /// way, and it is made from inside the request that found out.
+  Future<void> sessionEnded() async {
+    await ref.read(tokenProvider).clear();
+    state = const AsyncData(null);
+  }
+
   Future<void> logout() async {
     await ref.read(authRepositoryProvider).logout();
     state = const AsyncData(null);

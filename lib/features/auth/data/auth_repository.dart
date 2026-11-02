@@ -19,7 +19,10 @@ class AuthRepository {
       parser: (json) => json as Map<String, dynamic>,
     );
 
-    await _tokenStorage.save(response['token'] as String);
+    await _tokenStorage.save(
+      response['token'] as String,
+      response['refreshToken'] as String,
+    );
     return User.fromJson(response);
   }
 
@@ -38,7 +41,21 @@ class AuthRepository {
     );
   }
 
-  Future<void> logout() => _tokenStorage.clear();
+  /// Ends the session on the server too, so the refresh token cannot be used
+  /// again. Signing out must work offline, so a failure there is ignored.
+  Future<void> logout() async {
+    final refreshToken = await _tokenStorage.readRefresh();
+    if (refreshToken != null) {
+      try {
+        await _apiClient.post<void>(
+          '/auth/logout',
+          data: {'refreshToken': refreshToken},
+          parser: (_) {},
+        );
+      } catch (_) {}
+    }
+    await _tokenStorage.clear();
+  }
 }
 
 @Riverpod(keepAlive: true)
