@@ -3,8 +3,8 @@ import 'package:event_hub_mobile/core/router/app_router.dart';
 import 'package:event_hub_mobile/core/theme/app_theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +13,12 @@ Future<void> main() async {
     Stripe.publishableKey = Env.stripePublishableKey;
     await Stripe.instance.applySettings();
   }
-  runApp(const ProviderScope(child: EventHubApp()));
+  runApp(
+    ProviderScope(
+      retry: (retryCount, error) => null,
+      child: const EventHubApp(),
+    ),
+  );
 }
 
 class EventHubApp extends ConsumerWidget {
