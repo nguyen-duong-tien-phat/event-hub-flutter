@@ -34,6 +34,24 @@ class AuthRepository {
     );
   }
 
+  /// Emails a 6-digit code. The server answers the same for any email, so this
+  /// does not say whether the account exists.
+  Future<void> forgotPassword(String email) {
+    return _apiClient.post<void>(
+      '/auth/forgot-password',
+      data: {'email': email},
+      parser: (_) {},
+    );
+  }
+
+  Future<void> resetPassword(String email, String code, String newPassword) {
+    return _apiClient.post<void>(
+      '/auth/reset-password',
+      data: {'email': email, 'code': code, 'newPassword': newPassword},
+      parser: (_) {},
+    );
+  }
+
   Future<User> me() {
     return _apiClient.get(
       '/auth/me',

@@ -1,5 +1,6 @@
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Text field with a label above it.
 ///
@@ -12,6 +13,7 @@ class AppTextField extends StatefulWidget {
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
   final TextInputAction textInputAction;
   final Iterable<String>? autofillHints;
   final bool obscureText;
@@ -28,6 +30,7 @@ class AppTextField extends StatefulWidget {
     this.controller,
     this.validator,
     this.keyboardType,
+    this.inputFormatters,
     this.textInputAction = TextInputAction.next,
     this.autofillHints,
     this.obscureText = false,
@@ -101,6 +104,7 @@ class _AppTextFieldState extends State<AppTextField> {
               ? AutovalidateMode.always
               : AutovalidateMode.disabled,
           keyboardType: widget.keyboardType,
+          inputFormatters: widget.inputFormatters,
           textInputAction: widget.textInputAction,
           autofillHints: widget.autofillHints,
           obscureText: widget.obscureText,
