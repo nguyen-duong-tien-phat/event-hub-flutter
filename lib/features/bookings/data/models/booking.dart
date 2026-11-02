@@ -74,6 +74,7 @@ class Booking {
     required this.status,
     required this.createdAt,
     required this.expiresAt,
+    this.ticketCodes = const [],
     this.clientSecret,
   });
 
@@ -90,6 +91,10 @@ class Booking {
 
   /// While pending, the tickets are held until this time.
   final DateTime expiresAt;
+
+  /// Signed QR contents, one per ticket in order. The backend only sends them once the
+  /// booking is confirmed; the app cannot make a valid one itself.
+  final List<String> ticketCodes;
 
   /// Stripe client secret to pay with. Only sent when the booking is created.
   final String? clientSecret;
@@ -123,6 +128,9 @@ class Booking {
       status: BookingStatus.parse(json['status'] as String),
       createdAt: DateTime.parse(json['createdAt'] as String).toLocal(),
       expiresAt: DateTime.parse(json['expiresAt'] as String).toLocal(),
+      ticketCodes: (json['ticketCodes'] as List? ?? const [])
+          .cast<String>()
+          .toList(),
       clientSecret: json['clientSecret'] as String?,
     );
   }

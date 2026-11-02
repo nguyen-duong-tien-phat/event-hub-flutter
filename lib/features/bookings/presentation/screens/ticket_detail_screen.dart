@@ -228,7 +228,11 @@ class _TicketCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: QrImageView(
-                        data: 'eventhub:ticket:${booking.id}:$number',
+                        // Signed by the backend. Without one (not paid yet) the QR is
+                        // dimmed and only shows the visible ticket number.
+                        data:
+                            booking.ticketCodes.elementAtOrNull(number - 1) ??
+                            _code,
                         size: 190,
                         padding: EdgeInsets.zero,
                         eyeStyle: QrEyeStyle(
