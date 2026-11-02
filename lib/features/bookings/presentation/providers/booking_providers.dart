@@ -26,3 +26,17 @@ class PaymentSecrets extends _$PaymentSecrets {
   void put(String bookingId, String secret) =>
       state = {...state, bookingId: secret};
 }
+
+/// Bookings whose Stripe payment sheet is open right now. While a booking is
+/// in here nothing may cancel it, or the customer could pay for tickets that
+/// were already given back.
+@Riverpod(keepAlive: true)
+class PaymentsInProgress extends _$PaymentsInProgress {
+  @override
+  Set<String> build() => {};
+
+  void start(String bookingId) => state = {...state, bookingId};
+
+  void finish(String bookingId) =>
+      state = state.where((id) => id != bookingId).toSet();
+}

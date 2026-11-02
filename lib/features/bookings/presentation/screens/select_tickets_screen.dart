@@ -113,6 +113,7 @@ class _PickerState extends ConsumerState<_Picker> {
   }
 
   Future<void> _continue() async {
+    if (_isLoading) return;
     setState(() => _isLoading = true);
     final messenger = ScaffoldMessenger.of(context);
 

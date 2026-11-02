@@ -176,7 +176,7 @@ final class EventResultsProvider
   }
 }
 
-String _$eventResultsHash() => r'c57db155ee64f2bdd12ebb1f9b3362e6be856eed';
+String _$eventResultsHash() => r'406067a1033e0e9505f879e428ee4b816df5b87a';
 
 /// Events matching [filters] and the text [query], soonest first.
 

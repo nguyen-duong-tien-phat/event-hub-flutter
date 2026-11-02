@@ -33,7 +33,7 @@ class Event extends EventSummary {
       id: json['id'],
       title: json['title'],
       organizer: Organizer.fromJson(json['organizer'] as Map<String, dynamic>),
-      startsAt: DateTime.parse(json['startsAt'] as String),
+      startsAt: DateTime.parse(json['startsAt'] as String).toLocal(),
       location: json['location'],
       imageUrl: json['imageUrl'],
       category: json['category'] as String? ?? '',

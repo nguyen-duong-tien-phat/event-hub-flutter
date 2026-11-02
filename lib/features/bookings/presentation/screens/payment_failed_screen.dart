@@ -23,9 +23,13 @@ class PaymentFailedScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final booking = ref.watch(bookingProvider(bookingId)).value;
-    final message =
-        '${reason ?? 'Your payment couldn’t be processed.'} '
-        'You haven’t been charged, and your tickets are still held for you.';
+    // The hold ran out while the customer was paying.
+    final expired = booking?.isCancelled ?? false;
+    final message = expired
+        ? 'Your tickets were given back before the payment finished. '
+              'If you were charged, the money is on its way back to you.'
+        : '${reason ?? 'Your payment couldn’t be processed.'} '
+              'You haven’t been charged, and your tickets are still held for you.';
 
     return Scaffold(
       body: Column(
@@ -53,7 +57,7 @@ class PaymentFailedScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'Payment didn’t go through',
+                  expired ? 'Your hold expired' : 'Payment didn’t go through',
                   textAlign: TextAlign.center,
                   style: context.title,
                 ),
@@ -84,25 +88,27 @@ class PaymentFailedScreen extends ConsumerWidget {
                 spacing: 10,
                 children: [
                   AppButton(
-                    label: 'Try again',
+                    label: expired ? 'Back to home' : 'Try again',
                     variant: AppButtonVariant.dark,
                     size: AppButtonSize.large,
                     expand: true,
-                    onPressed: () =>
-                        context.pushReplacement(AppRoutes.payment(bookingId)),
+                    onPressed: () => expired
+                        ? context.go(AppRoutes.home)
+                        : context.pushReplacement(AppRoutes.payment(bookingId)),
                   ),
-                  AppButton(
-                    label: 'Cancel booking',
-                    variant: AppButtonVariant.secondary,
-                    size: AppButtonSize.large,
-                    expand: true,
-                    onPressed: () async {
-                      await ref
-                          .read(bookingRepositoryProvider)
-                          .releaseIfPending(bookingId);
-                      if (context.mounted) context.go(AppRoutes.home);
-                    },
-                  ),
+                  if (!expired)
+                    AppButton(
+                      label: 'Cancel booking',
+                      variant: AppButtonVariant.secondary,
+                      size: AppButtonSize.large,
+                      expand: true,
+                      onPressed: () async {
+                        await ref
+                            .read(bookingRepositoryProvider)
+                            .releaseIfPending(bookingId);
+                        if (context.mounted) context.go(AppRoutes.home);
+                      },
+                    ),
                 ],
               ),
             ),

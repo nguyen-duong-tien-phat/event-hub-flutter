@@ -62,6 +62,8 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     }
 
     setState(() => _isPaying = true);
+    final inProgress = ref.read(paymentsInProgressProvider.notifier);
+    inProgress.start(booking.id);
     try {
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
@@ -71,10 +73,17 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
         ),
       );
       await Stripe.instance.presentPaymentSheet();
-      await _confirm(booking.id);
+      final confirmed = await _confirm(booking.id);
       ref.invalidate(myBookingsProvider);
-      // go (not push): the checkout and payment screens are done with.
-      if (mounted) context.go(AppRoutes.orderSuccess(booking.id));
+      ref.invalidate(bookingProvider(booking.id));
+      if (!mounted) return;
+      if (confirmed.isCancelled) {
+        // The hold ran out before the payment finished. The backend refunds.
+        context.pushReplacement(AppRoutes.paymentFailed(booking.id));
+      } else {
+        // go (not push): the checkout and payment screens are done with.
+        context.go(AppRoutes.orderSuccess(booking.id));
+      }
     } on StripeException catch (e) {
       // Closing the sheet is not a failure: stay here.
       if (e.error.code != FailureCode.Canceled && mounted) {
@@ -86,19 +95,23 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     } on ApiException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } finally {
+      inProgress.finish(booking.id);
       if (mounted) setState(() => _isPaying = false);
     }
   }
 
   /// The money has been taken; wait a moment for the backend to see it. Asking
   /// Stripe directly means this does not depend on the webhook arriving.
-  Future<void> _confirm(String bookingId) async {
+  Future<Booking> _confirm(String bookingId) async {
     final repository = ref.read(bookingRepositoryProvider);
-    for (var attempt = 0; attempt < 6; attempt++) {
-      final booking = await repository.confirm(bookingId);
-      if (booking.isConfirmed) return;
+    var booking = await repository.confirm(bookingId);
+    for (var attempt = 1; attempt < 6; attempt++) {
+      // Cancelled is final too: the hold ran out and the backend refunds.
+      if (booking.isConfirmed || booking.isCancelled) break;
       await Future<void>.delayed(const Duration(milliseconds: 1200));
+      booking = await repository.confirm(bookingId);
     }
+    return booking;
   }
 
   @override

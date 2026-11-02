@@ -183,3 +183,70 @@ abstract class _$PaymentSecrets extends $Notifier<Map<String, String>> {
     return element.handleCreate(ref, build);
   }
 }
+
+/// Bookings whose Stripe payment sheet is open right now. While a booking is
+/// in here nothing may cancel it, or the customer could pay for tickets that
+/// were already given back.
+
+@ProviderFor(PaymentsInProgress)
+final paymentsInProgressProvider = PaymentsInProgressProvider._();
+
+/// Bookings whose Stripe payment sheet is open right now. While a booking is
+/// in here nothing may cancel it, or the customer could pay for tickets that
+/// were already given back.
+final class PaymentsInProgressProvider
+    extends $NotifierProvider<PaymentsInProgress, Set<String>> {
+  /// Bookings whose Stripe payment sheet is open right now. While a booking is
+  /// in here nothing may cancel it, or the customer could pay for tickets that
+  /// were already given back.
+  PaymentsInProgressProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'paymentsInProgressProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$paymentsInProgressHash();
+
+  @$internal
+  @override
+  PaymentsInProgress create() => PaymentsInProgress();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Set<String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Set<String>>(value),
+    );
+  }
+}
+
+String _$paymentsInProgressHash() =>
+    r'56443dd5821af2cfc3199f46d59803623634e7ab';
+
+/// Bookings whose Stripe payment sheet is open right now. While a booking is
+/// in here nothing may cancel it, or the customer could pay for tickets that
+/// were already given back.
+
+abstract class _$PaymentsInProgress extends $Notifier<Set<String>> {
+  Set<String> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<Set<String>, Set<String>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<Set<String>, Set<String>>,
+              Set<String>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

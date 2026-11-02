@@ -35,10 +35,17 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   late final _repository = ref.read(bookingRepositoryProvider);
 
+  /// Giving the tickets back while the payment sheet is open would let the
+  /// customer pay for tickets that are gone.
+  void _release() {
+    if (ref.read(paymentsInProgressProvider).contains(widget.bookingId)) return;
+    _repository.releaseIfPending(widget.bookingId);
+  }
+
   void _onExpired() {
     if (_expired) return;
     setState(() => _expired = true);
-    _repository.releaseIfPending(widget.bookingId);
+    _release();
   }
 
   @override
@@ -49,7 +56,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       // Any way out of this screen (back button, swipe) releases the tickets.
       // Going on to payment pushes a new screen, so it does not count.
       onPopInvokedWithResult: (didPop, _) {
-        if (didPop) _repository.releaseIfPending(widget.bookingId);
+        if (didPop) _release();
       },
       child: Scaffold(
         bottomNavigationBar: booking.value == null

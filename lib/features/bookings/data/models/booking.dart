@@ -29,7 +29,7 @@ class BookingEvent {
     return BookingEvent(
       id: json['id'],
       title: json['title'],
-      startsAt: DateTime.parse(json['startsAt'] as String),
+      startsAt: DateTime.parse(json['startsAt'] as String).toLocal(),
       location: json['location'],
       imageUrl: json['imageUrl'],
     );
@@ -96,6 +96,7 @@ class Booking {
 
   bool get isPending => status == BookingStatus.pending;
   bool get isConfirmed => status == BookingStatus.confirmed;
+  bool get isCancelled => status == BookingStatus.cancelled;
 
   /// Short code to show people, e.g. "EH-3F9A2C".
   String get orderNumber => 'EH-${id.substring(id.length - 6).toUpperCase()}';
@@ -120,8 +121,8 @@ class Booking {
       serviceFee: (json['serviceFee'] as num).toDouble(),
       totalPrice: (json['totalPrice'] as num).toDouble(),
       status: BookingStatus.parse(json['status'] as String),
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      expiresAt: DateTime.parse(json['expiresAt'] as String),
+      createdAt: DateTime.parse(json['createdAt'] as String).toLocal(),
+      expiresAt: DateTime.parse(json['expiresAt'] as String).toLocal(),
       clientSecret: json['clientSecret'] as String?,
     );
   }
