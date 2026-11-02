@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart' show RangeValues;
+
 enum DateFilter {
   today('Today'),
   tomorrow('Tomorrow'),
@@ -7,6 +9,10 @@ enum DateFilter {
   const DateFilter(this.label);
   final String label;
 }
+
+/// The slider runs from $0 to this; dragging the top handle all the way right
+/// means "no upper limit".
+const priceSliderMax = 200.0;
 
 enum PriceFilter {
   free('Free', max: 0),
@@ -20,32 +26,47 @@ enum PriceFilter {
   final double? max;
 }
 
-/// Event categories the backend knows about, as they are stored.
-const eventCategories = [
-  'Concert',
-  'Food & Drink',
-  'Festival',
-  'Conference',
-  'Market',
-  'Sports',
-  'Art',
-  'Comedy',
-];
-
 /// What the user narrowed the event list down to. Immutable, and equal when
 /// the choices are equal, so it can key a provider.
 class EventFilters {
-  const EventFilters({this.date, this.day, this.price, this.category});
+  const EventFilters({
+    this.date,
+    this.day,
+    this.price,
+    this.priceRange,
+    this.category,
+  });
 
   final DateFilter? date;
 
   /// A single day picked on the calendar. Replaces [date], never used with it.
   final DateTime? day;
   final PriceFilter? price;
+
+  /// A price range picked on the slider. Replaces [price], never used with it.
+  final RangeValues? priceRange;
+
+  /// What to send to the backend: null means "no limit on that side".
+  double? get minPrice {
+    final range = priceRange;
+    if (range != null) return range.start > 0 ? range.start : null;
+    return price?.min;
+  }
+
+  double? get maxPrice {
+    final range = priceRange;
+    if (range != null) return range.end < priceSliderMax ? range.end : null;
+    return price?.max;
+  }
+
+  /// The slider's handles for the current choice: a preset moves them too.
+  RangeValues get sliderValues =>
+      priceRange ?? RangeValues(price?.min ?? 0, price?.max ?? priceSliderMax);
   final String? category;
 
   /// How many filters are on.
-  int get count => [date, day, price, category].where((f) => f != null).length;
+  int get count =>
+      [date, day, price, priceRange, category].where((f) => f != null).length;
 
   bool get isEmpty => count == 0;
 
@@ -54,12 +75,14 @@ class EventFilters {
     DateFilter? Function()? date,
     DateTime? Function()? day,
     PriceFilter? Function()? price,
+    RangeValues? Function()? priceRange,
     String? Function()? category,
   }) {
     return EventFilters(
       date: date != null ? date() : this.date,
       day: day != null ? day() : this.day,
       price: price != null ? price() : this.price,
+      priceRange: priceRange != null ? priceRange() : this.priceRange,
       category: category != null ? category() : this.category,
     );
   }
@@ -108,8 +131,9 @@ class EventFilters {
       other.date == date &&
       other.day == day &&
       other.price == price &&
+      other.priceRange == priceRange &&
       other.category == category;
 
   @override
-  int get hashCode => Object.hash(date, day, price, category);
+  int get hashCode => Object.hash(date, day, price, priceRange, category);
 }

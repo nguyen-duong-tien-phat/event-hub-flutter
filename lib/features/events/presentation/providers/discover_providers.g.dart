@@ -70,6 +70,50 @@ abstract class _$DiscoverFilters extends $Notifier<EventFilters> {
   }
 }
 
+/// The categories to filter by, as the backend stores them.
+
+@ProviderFor(eventCategories)
+final eventCategoriesProvider = EventCategoriesProvider._();
+
+/// The categories to filter by, as the backend stores them.
+
+final class EventCategoriesProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<String>>,
+          List<String>,
+          FutureOr<List<String>>
+        >
+    with $FutureModifier<List<String>>, $FutureProvider<List<String>> {
+  /// The categories to filter by, as the backend stores them.
+  EventCategoriesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'eventCategoriesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$eventCategoriesHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<String>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<String>> create(Ref ref) {
+    return eventCategories(ref);
+  }
+}
+
+String _$eventCategoriesHash() => r'46347c79383963c89a3c507ac3078d2a0a375921';
+
 /// Events matching [filters] and the text [query], soonest first.
 
 @ProviderFor(eventResults)

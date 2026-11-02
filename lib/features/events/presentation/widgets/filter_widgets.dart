@@ -1,4 +1,5 @@
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
+import 'package:event_hub_mobile/core/widgets/app_button.dart';
 import 'package:event_hub_mobile/core/widgets/bottom_action_bar.dart';
 import 'package:event_hub_mobile/features/events/data/models/event_filters.dart';
 import 'package:event_hub_mobile/features/events/presentation/providers/discover_providers.dart';
@@ -35,11 +36,14 @@ class FilterChipButton extends StatelessWidget {
         child: Container(
           height: height,
           padding: const EdgeInsets.symmetric(horizontal: 14),
-          alignment: Alignment.center,
-          child: Text(
-            label,
-            style: context.control.copyWith(
-              color: selected ? Colors.white : context.ink,
+          // Hug the label; a plain centered Container would fill a Wrap's row.
+          child: Center(
+            widthFactor: 1,
+            child: Text(
+              label,
+              style: context.control.copyWith(
+                color: selected ? Colors.white : context.ink,
+              ),
             ),
           ),
         ),
@@ -86,6 +90,7 @@ class QuickFilterChips extends ConsumerWidget {
               price: () => filters.price == PriceFilter.under25
                   ? null
                   : PriceFilter.under25,
+              priceRange: () => null,
             ),
           ),
           chip(
@@ -94,6 +99,7 @@ class QuickFilterChips extends ConsumerWidget {
             () => filters.copyWith(
               price: () =>
                   filters.price == PriceFilter.free ? null : PriceFilter.free,
+              priceRange: () => null,
             ),
           ),
           chip(
@@ -175,8 +181,11 @@ Future<void> showFiltersSheet(BuildContext context, {String query = ''}) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    showDragHandle: true,
-    backgroundColor: Theme.of(context).colorScheme.surface,
+    showDragHandle: false,
+    backgroundColor: context.surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
     builder: (_) => FiltersSheet(query: query),
   );
 }
@@ -212,6 +221,7 @@ class _FiltersSheetState extends ConsumerState<FiltersSheet> {
     // How many events the draft would show, so the button can say so.
     final results = ref.watch(eventResultsProvider(_draft, widget.query));
     final count = results.value?.totalCount;
+    final categories = ref.watch(eventCategoriesProvider).value ?? const [];
 
     return ConstrainedBox(
       constraints: BoxConstraints(
@@ -219,9 +229,23 @@ class _FiltersSheetState extends ConsumerState<FiltersSheet> {
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
+            padding: const EdgeInsets.only(top: 8),
+            child: Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: context.line,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -245,9 +269,10 @@ class _FiltersSheetState extends ConsumerState<FiltersSheet> {
               ],
             ),
           ),
+          Divider(height: 1, color: context.line),
           Flexible(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 24,
@@ -272,30 +297,49 @@ class _FiltersSheetState extends ConsumerState<FiltersSheet> {
                       onTap: _pickDay,
                     ),
                   ]),
-                  _Group('Price', [
-                    for (final p in PriceFilter.values)
-                      FilterChipButton(
-                        label: p.label,
-                        selected: _draft.price == p,
-                        onTap: () => setState(
-                          () => _draft = _draft.copyWith(
-                            price: () => _draft.price == p ? null : p,
+                  _Group(
+                    'Price',
+                    [
+                      for (final p in PriceFilter.values)
+                        FilterChipButton(
+                          label: p.label,
+                          selected: _draft.price == p,
+                          onTap: () => setState(
+                            () => _draft = _draft.copyWith(
+                              price: () => _draft.price == p ? null : p,
+                              priceRange: () => null,
+                            ),
                           ),
                         ),
-                      ),
-                  ]),
-                  _Group('Category', [
-                    for (final c in eventCategories)
-                      FilterChipButton(
-                        label: c,
-                        selected: _draft.category == c,
-                        onTap: () => setState(
-                          () => _draft = _draft.copyWith(
-                            category: () => _draft.category == c ? null : c,
-                          ),
+                    ],
+                    below: _PriceSlider(
+                      values: _draft.sliderValues,
+                      onChanged: (range) => setState(
+                        () => _draft = _draft.copyWith(
+                          price: () => null,
+                          // Both handles at the ends is just "any price".
+                          priceRange: () =>
+                              range.start == 0 && range.end == priceSliderMax
+                              ? null
+                              : range,
                         ),
                       ),
-                  ]),
+                    ),
+                  ),
+                  // Hidden until loaded, or if it fails: the other filters still work.
+                  if (categories.isNotEmpty)
+                    _Group('Category', [
+                      for (final c in categories)
+                        FilterChipButton(
+                          label: c,
+                          selected: _draft.category == c,
+                          onTap: () => setState(
+                            () => _draft = _draft.copyWith(
+                              category: () => _draft.category == c ? null : c,
+                            ),
+                          ),
+                        ),
+                    ]),
                 ],
               ),
             ),
@@ -304,6 +348,7 @@ class _FiltersSheetState extends ConsumerState<FiltersSheet> {
             actionLabel: count == null
                 ? 'Show events'
                 : 'Show $count ${count == 1 ? 'event' : 'events'}',
+            variant: AppButtonVariant.dark,
             onPressed: () {
               ref.read(discoverFiltersProvider.notifier).set(_draft);
               Navigator.of(context).pop();
@@ -315,11 +360,62 @@ class _FiltersSheetState extends ConsumerState<FiltersSheet> {
   }
 }
 
+/// A two-handled slider for a price range, with the chosen range above it.
+class _PriceSlider extends StatelessWidget {
+  const _PriceSlider({required this.values, required this.onChanged});
+
+  final RangeValues values;
+  final ValueChanged<RangeValues> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final top = values.end >= priceSliderMax;
+    final label = values.start == 0 && top
+        ? 'Any price'
+        : values.end == 0
+        ? 'Free'
+        : '\$${values.start.round()} – \$${values.end.round()}${top ? '+' : ''}';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: context.fieldLabel.copyWith(color: context.muted)),
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            activeTrackColor: context.ink,
+            inactiveTrackColor: context.line,
+            thumbColor: context.ink,
+            overlayColor: context.ink.withValues(alpha: 0.08),
+            rangeThumbShape: const RoundRangeSliderThumbShape(
+              enabledThumbRadius: 10,
+              elevation: 0,
+              pressedElevation: 0,
+            ),
+            rangeTickMarkShape: const RoundRangeSliderTickMarkShape(
+              tickMarkRadius: 0, // steps of $5 without dots on the track
+            ),
+            trackHeight: 4,
+          ),
+          child: RangeSlider(
+            values: values,
+            max: priceSliderMax,
+            divisions: 40,
+            onChanged: onChanged,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _Group extends StatelessWidget {
-  const _Group(this.title, this.chips);
+  const _Group(this.title, this.chips, {this.below});
 
   final String title;
   final List<Widget> chips;
+
+  /// Shown under the chips.
+  final Widget? below;
 
   @override
   Widget build(BuildContext context) {
@@ -329,6 +425,7 @@ class _Group extends StatelessWidget {
       children: [
         Text(title, style: context.link.copyWith(color: context.ink)),
         Wrap(spacing: 8, runSpacing: 8, children: chips),
+        ?below,
       ],
     );
   }

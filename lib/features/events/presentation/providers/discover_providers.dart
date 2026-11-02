@@ -18,6 +18,11 @@ class DiscoverFilters extends _$DiscoverFilters {
   void reset() => state = const EventFilters();
 }
 
+/// The categories to filter by, as the backend stores them.
+@riverpod
+Future<List<String>> eventCategories(Ref ref) =>
+    ref.watch(eventRepositoryProvider).getCategories();
+
 /// Events matching [filters] and the text [query], soonest first.
 @riverpod
 Future<PaginatedResponse<EventSummary>> eventResults(
@@ -35,7 +40,7 @@ Future<PaginatedResponse<EventSummary>> eventResults(
         to: range.to,
         search: query.trim(),
         category: filters.category,
-        minPrice: filters.price?.min,
-        maxPrice: filters.price?.max,
+        minPrice: filters.minPrice,
+        maxPrice: filters.maxPrice,
       );
 }

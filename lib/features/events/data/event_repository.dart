@@ -12,6 +12,12 @@ class EventRepository {
 
   final ApiClient _apiClient;
 
+  /// Categories that have an upcoming event, to offer in the filters.
+  Future<List<String>> getCategories() => _apiClient.get(
+    '/events/categories',
+    parser: (json) => (json as List).cast<String>(),
+  );
+
   Future<PaginatedResponse<EventSummary>> getEvents({
     int page = 1,
     int pageSize = 10,
