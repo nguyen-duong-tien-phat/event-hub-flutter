@@ -7,7 +7,9 @@ part 'events_provider.g.dart';
 
 @riverpod
 Future<List<EventSummary>> featuredEvents(Ref ref) async {
-  final response = await ref.watch(eventRepositoryProvider).getFeturedEvents(5);
+  final response = await ref
+      .watch(eventRepositoryProvider)
+      .getFeaturedEvents(5);
   return response;
 }
 

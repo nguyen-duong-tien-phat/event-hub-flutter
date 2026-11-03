@@ -47,7 +47,7 @@ class EventRepository {
     );
   }
 
-  Future<List<EventSummary>> getFeturedEvents(int limit) {
+  Future<List<EventSummary>> getFeaturedEvents(int limit) {
     return _apiClient.get(
       '/events/featured',
       queryParameters: {'limit': limit},

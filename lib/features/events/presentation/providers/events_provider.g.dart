@@ -48,7 +48,7 @@ final class FeaturedEventsProvider
   }
 }
 
-String _$featuredEventsHash() => r'089b3defcf5a1897dfe0e1a95cc9cebf627ecf50';
+String _$featuredEventsHash() => r'a50853f49aa5cf824478c57de5d0dbe9eea9e5d5';
 
 @ProviderFor(upcomingEvents)
 final upcomingEventsProvider = UpcomingEventsProvider._();
