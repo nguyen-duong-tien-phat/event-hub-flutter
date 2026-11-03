@@ -1,9 +1,12 @@
 import 'package:event_hub_mobile/core/network/api_exception.dart';
+import 'package:event_hub_mobile/core/network/paged_state.dart';
 import 'package:event_hub_mobile/core/router/app_routes.dart';
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:event_hub_mobile/core/widgets/app_button.dart';
 import 'package:event_hub_mobile/core/widgets/app_header.dart';
+import 'package:event_hub_mobile/core/widgets/load_more_footer.dart';
 import 'package:event_hub_mobile/core/widgets/message_state.dart';
+import 'package:event_hub_mobile/core/widgets/near_end_listener.dart';
 import 'package:event_hub_mobile/features/events/data/models/event_summary.dart';
 import 'package:event_hub_mobile/features/events/presentation/providers/discover_providers.dart';
 import 'package:event_hub_mobile/features/events/presentation/widgets/event_item.dart';
@@ -78,8 +81,10 @@ class DiscoverScreen extends ConsumerWidget {
                             ),
                     )
                   : EventList(
-                      events: page.items,
-                      total: page.totalCount,
+                      page: page,
+                      onLoadMore: ref
+                          .watch(eventResultsProvider(filters, '').notifier)
+                          .loadMore,
                       onRefresh: () =>
                           ref.refresh(eventResultsProvider(filters, '').future),
                     ),
@@ -135,33 +140,35 @@ class _SearchTile extends StatelessWidget {
   }
 }
 
-/// "N events" over a list of compact event rows (with prices).
+/// "N events" over a list of compact event rows (with prices). Asks for the
+/// next page ([onLoadMore]) when scrolled near the bottom.
 class EventList extends StatelessWidget {
   const EventList({
     super.key,
-    required List<EventSummary> this.events,
-    required int this.total,
+    required PagedState<EventSummary> this.page,
+    required VoidCallback this.onLoadMore,
     this.onRefresh,
   });
 
   const EventList.loading({super.key})
-    : events = null,
-      total = null,
+    : page = null,
+      onLoadMore = null,
       onRefresh = null;
 
-  final List<EventSummary>? events;
-  final int? total;
+  final PagedState<EventSummary>? page;
+  final VoidCallback? onLoadMore;
   final Future<void> Function()? onRefresh;
 
   @override
   Widget build(BuildContext context) {
-    final events = this.events;
+    final page = this.page;
+    final total = page?.totalCount;
 
     final list = ListView(
-      physics: events == null ? const NeverScrollableScrollPhysics() : null,
+      physics: page == null ? const NeverScrollableScrollPhysics() : null,
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
       children: [
-        if (events != null)
+        if (page != null)
           Padding(
             padding: const EdgeInsets.only(bottom: 14),
             child: Text(
@@ -169,21 +176,34 @@ class EventList extends StatelessWidget {
               style: context.meta.copyWith(color: context.muted),
             ),
           ),
-        if (events == null)
+        if (page == null)
           for (var i = 0; i < 5; i++) ...[
             const EventItem(event: null),
             const SizedBox(height: 18),
           ]
-        else
-          for (final event in events) ...[
+        else ...[
+          for (final event in page.items) ...[
             EventItem(event: event, showPrice: true, showVenue: true),
             const SizedBox(height: 18),
           ],
+          LoadMoreFooter(
+            isLoading: page.isLoadingMore,
+            hasError: page.loadMoreError != null,
+            onRetry: onLoadMore!,
+          ),
+        ],
       ],
     );
 
+    if (page == null) return list;
+
+    final scrollable = NearEndListener(
+      // Off after a failure, so it is only retried with the button.
+      onNearEnd: page.loadMoreError == null ? onLoadMore : null,
+      child: list,
+    );
     return onRefresh == null
-        ? list
-        : RefreshIndicator(onRefresh: onRefresh!, child: list);
+        ? scrollable
+        : RefreshIndicator(onRefresh: onRefresh!, child: scrollable);
   }
 }

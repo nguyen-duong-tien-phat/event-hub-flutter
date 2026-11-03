@@ -175,8 +175,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ],
             )
           : EventList(
-              events: page.items,
-              total: page.totalCount,
+              page: page,
+              onLoadMore: ref
+                  .watch(eventResultsProvider(filters, _query).notifier)
+                  .loadMore,
               onRefresh: () =>
                   ref.refresh(eventResultsProvider(filters, _query).future),
             ),

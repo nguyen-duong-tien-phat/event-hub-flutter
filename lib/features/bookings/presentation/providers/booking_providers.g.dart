@@ -78,22 +78,24 @@ final class BookingFamily extends $Family
   String toString() => r'bookingProvider';
 }
 
-/// The signed-in user's bookings, newest first (the Tickets tab).
+/// The signed-in user's bookings (the Tickets tab), one page at a time.
+///
+/// The backend does not promise an order for this list, and the Tickets screen
+/// sorts by event date itself, so the order here does not matter.
 
-@ProviderFor(myBookings)
+@ProviderFor(MyBookings)
 final myBookingsProvider = MyBookingsProvider._();
 
-/// The signed-in user's bookings, newest first (the Tickets tab).
-
+/// The signed-in user's bookings (the Tickets tab), one page at a time.
+///
+/// The backend does not promise an order for this list, and the Tickets screen
+/// sorts by event date itself, so the order here does not matter.
 final class MyBookingsProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<List<Booking>>,
-          List<Booking>,
-          FutureOr<List<Booking>>
-        >
-    with $FutureModifier<List<Booking>>, $FutureProvider<List<Booking>> {
-  /// The signed-in user's bookings, newest first (the Tickets tab).
+    extends $AsyncNotifierProvider<MyBookings, PagedState<Booking>> {
+  /// The signed-in user's bookings (the Tickets tab), one page at a time.
+  ///
+  /// The backend does not promise an order for this list, and the Tickets screen
+  /// sorts by event date itself, so the order here does not matter.
   MyBookingsProvider._()
     : super(
         from: null,
@@ -110,17 +112,34 @@ final class MyBookingsProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<Booking>> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<List<Booking>> create(Ref ref) {
-    return myBookings(ref);
-  }
+  MyBookings create() => MyBookings();
 }
 
-String _$myBookingsHash() => r'613c07d8413c8ffaac84843896c5ee40b910ceef';
+String _$myBookingsHash() => r'72d1d64b3a5899d7cdbd1d2ee6fd3cbaf506bd92';
+
+/// The signed-in user's bookings (the Tickets tab), one page at a time.
+///
+/// The backend does not promise an order for this list, and the Tickets screen
+/// sorts by event date itself, so the order here does not matter.
+
+abstract class _$MyBookings extends $AsyncNotifier<PagedState<Booking>> {
+  FutureOr<PagedState<Booking>> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref =
+        this.ref as $Ref<AsyncValue<PagedState<Booking>>, PagedState<Booking>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<PagedState<Booking>>, PagedState<Booking>>,
+              AsyncValue<PagedState<Booking>>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
 
 /// Stripe client secrets by booking id. The backend only sends a secret when a
 /// booking is created, so it is kept here until the payment is done.

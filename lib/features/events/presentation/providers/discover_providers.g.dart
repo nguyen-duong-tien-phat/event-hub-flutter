@@ -114,24 +114,18 @@ final class EventCategoriesProvider
 
 String _$eventCategoriesHash() => r'46347c79383963c89a3c507ac3078d2a0a375921';
 
-/// Events matching [filters] and the text [query], soonest first.
+/// Events matching [filters] and the text [query], soonest first. Starts with
+/// the first page; [loadMore] adds the next ones to the end.
 
-@ProviderFor(eventResults)
+@ProviderFor(EventResults)
 final eventResultsProvider = EventResultsFamily._();
 
-/// Events matching [filters] and the text [query], soonest first.
-
+/// Events matching [filters] and the text [query], soonest first. Starts with
+/// the first page; [loadMore] adds the next ones to the end.
 final class EventResultsProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<PaginatedResponse<EventSummary>>,
-          PaginatedResponse<EventSummary>,
-          FutureOr<PaginatedResponse<EventSummary>>
-        >
-    with
-        $FutureModifier<PaginatedResponse<EventSummary>>,
-        $FutureProvider<PaginatedResponse<EventSummary>> {
-  /// Events matching [filters] and the text [query], soonest first.
+    extends $AsyncNotifierProvider<EventResults, PagedState<EventSummary>> {
+  /// Events matching [filters] and the text [query], soonest first. Starts with
+  /// the first page; [loadMore] adds the next ones to the end.
   EventResultsProvider._({
     required EventResultsFamily super.from,
     required (EventFilters, String) super.argument,
@@ -155,15 +149,7 @@ final class EventResultsProvider
 
   @$internal
   @override
-  $FutureProviderElement<PaginatedResponse<EventSummary>> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<PaginatedResponse<EventSummary>> create(Ref ref) {
-    final argument = this.argument as (EventFilters, String);
-    return eventResults(ref, argument.$1, argument.$2);
-  }
+  EventResults create() => EventResults();
 
   @override
   bool operator ==(Object other) {
@@ -176,14 +162,18 @@ final class EventResultsProvider
   }
 }
 
-String _$eventResultsHash() => r'406067a1033e0e9505f879e428ee4b816df5b87a';
+String _$eventResultsHash() => r'34741889e0836955624764cb8ae6f600f9dcbe40';
 
-/// Events matching [filters] and the text [query], soonest first.
+/// Events matching [filters] and the text [query], soonest first. Starts with
+/// the first page; [loadMore] adds the next ones to the end.
 
 final class EventResultsFamily extends $Family
     with
-        $FunctionalFamilyOverride<
-          FutureOr<PaginatedResponse<EventSummary>>,
+        $ClassFamilyOverride<
+          EventResults,
+          AsyncValue<PagedState<EventSummary>>,
+          PagedState<EventSummary>,
+          FutureOr<PagedState<EventSummary>>,
           (EventFilters, String)
         > {
   EventResultsFamily._()
@@ -195,11 +185,45 @@ final class EventResultsFamily extends $Family
         isAutoDispose: true,
       );
 
-  /// Events matching [filters] and the text [query], soonest first.
+  /// Events matching [filters] and the text [query], soonest first. Starts with
+  /// the first page; [loadMore] adds the next ones to the end.
 
   EventResultsProvider call(EventFilters filters, String query) =>
       EventResultsProvider._(argument: (filters, query), from: this);
 
   @override
   String toString() => r'eventResultsProvider';
+}
+
+/// Events matching [filters] and the text [query], soonest first. Starts with
+/// the first page; [loadMore] adds the next ones to the end.
+
+abstract class _$EventResults extends $AsyncNotifier<PagedState<EventSummary>> {
+  late final _$args = ref.$arg as (EventFilters, String);
+  EventFilters get filters => _$args.$1;
+  String get query => _$args.$2;
+
+  FutureOr<PagedState<EventSummary>> build(EventFilters filters, String query);
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<PagedState<EventSummary>>,
+              PagedState<EventSummary>
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<PagedState<EventSummary>>,
+                PagedState<EventSummary>
+              >,
+              AsyncValue<PagedState<EventSummary>>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, () => build(_$args.$1, _$args.$2));
+  }
 }

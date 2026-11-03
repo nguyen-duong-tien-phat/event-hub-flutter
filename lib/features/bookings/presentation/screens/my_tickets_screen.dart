@@ -1,8 +1,11 @@
 import 'package:event_hub_mobile/core/network/api_exception.dart';
+import 'package:event_hub_mobile/core/network/paged_state.dart';
 import 'package:event_hub_mobile/core/router/app_routes.dart';
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:event_hub_mobile/core/widgets/app_button.dart';
+import 'package:event_hub_mobile/core/widgets/load_more_footer.dart';
 import 'package:event_hub_mobile/core/widgets/message_state.dart';
+import 'package:event_hub_mobile/core/widgets/near_end_listener.dart';
 import 'package:event_hub_mobile/core/widgets/page_title.dart';
 import 'package:event_hub_mobile/features/bookings/data/models/booking.dart';
 import 'package:event_hub_mobile/features/bookings/presentation/providers/booking_providers.dart';
@@ -45,7 +48,7 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
               skipLoadingOnReload: true,
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, _) => _errorState(error),
-              data: (all) => _content(all),
+              data: (page) => _content(page),
             ),
           ),
         ],
@@ -84,9 +87,9 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
     );
   }
 
-  Widget _content(List<Booking> all) {
+  Widget _content(PagedState<Booking> page) {
     final now = DateTime.now().toUtc();
-    final confirmed = all
+    final confirmed = page.items
         .where((b) => b.isConfirmed && b.event != null)
         .toList();
 
@@ -98,6 +101,30 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
           ..sort((a, b) => b.event!.startsAt.compareTo(a.event!.startsAt));
 
     final shown = _showPast ? past : upcoming;
+
+    final notifier = ref.watch(myBookingsProvider.notifier);
+
+    if (shown.isEmpty && page.hasMore) {
+      // Nothing to show on this tab yet, but later pages may hold some (the
+      // pages are not sorted by event date), so keep loading instead of
+      // claiming there are none.
+      if (page.loadMoreError == null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) notifier.loadMore();
+        });
+      }
+      return Padding(
+        padding: const EdgeInsets.only(top: 48),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: LoadMoreFooter(
+            isLoading: page.loadMoreError == null,
+            hasError: page.loadMoreError != null,
+            onRetry: notifier.loadMore,
+          ),
+        ),
+      );
+    }
 
     if (shown.isEmpty) {
       return MessageState(
@@ -117,34 +144,43 @@ class _MyTicketsScreenState extends ConsumerState<MyTicketsScreen> {
 
     return RefreshIndicator(
       onRefresh: () => ref.refresh(myBookingsProvider.future),
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-        children: [
-          if (!_showPast) ...[
-            Text(
-              _nextUpLabel(shown.first.event!.startsAt),
-              style: context.overline.copyWith(color: context.muted),
-            ),
-            const SizedBox(height: 12),
-            _NextUpCard(booking: shown.first),
-            if (shown.length > 1) ...[
-              const SizedBox(height: 20),
+      child: NearEndListener(
+        // Off after a failure, so it is only retried with the button.
+        onNearEnd: page.loadMoreError == null ? notifier.loadMore : null,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+          children: [
+            if (!_showPast) ...[
               Text(
-                'LATER',
+                _nextUpLabel(shown.first.event!.startsAt),
                 style: context.overline.copyWith(color: context.muted),
               ),
               const SizedBox(height: 12),
-            ],
-            for (final booking in shown.skip(1)) ...[
-              _TicketRow(booking: booking),
-              const SizedBox(height: 12),
-            ],
-          ] else
-            for (final booking in shown) ...[
-              _TicketRow(booking: booking, faded: true),
-              const SizedBox(height: 12),
-            ],
-        ],
+              _NextUpCard(booking: shown.first),
+              if (shown.length > 1) ...[
+                const SizedBox(height: 20),
+                Text(
+                  'LATER',
+                  style: context.overline.copyWith(color: context.muted),
+                ),
+                const SizedBox(height: 12),
+              ],
+              for (final booking in shown.skip(1)) ...[
+                _TicketRow(booking: booking),
+                const SizedBox(height: 12),
+              ],
+            ] else
+              for (final booking in shown) ...[
+                _TicketRow(booking: booking, faded: true),
+                const SizedBox(height: 12),
+              ],
+            LoadMoreFooter(
+              isLoading: page.isLoadingMore,
+              hasError: page.loadMoreError != null,
+              onRetry: notifier.loadMore,
+            ),
+          ],
+        ),
       ),
     );
   }
