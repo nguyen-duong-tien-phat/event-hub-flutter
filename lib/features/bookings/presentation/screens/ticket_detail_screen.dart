@@ -9,6 +9,7 @@ import 'package:event_hub_mobile/features/bookings/data/models/booking.dart';
 import 'package:event_hub_mobile/features/bookings/presentation/providers/booking_providers.dart';
 import 'package:event_hub_mobile/features/bookings/presentation/widgets/booking_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -65,11 +66,21 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
     final event = booking.event;
     final holder = ref.watch(authProvider).value?.fullName ?? '';
 
-    // "2 × General, 1 × VIP" becomes three tickets, numbered 1 to 3.
-    final tickets = [
-      for (final item in booking.tickets)
-        for (var i = 0; i < item.quantity; i++) item.type,
-    ];
+    final tickets = booking.admissions;
+
+    if (event != null && booking.isConfirmed && tickets.isEmpty) {
+      // Paid, but the tickets are issued a moment later.
+      return MessageState(
+        icon: LucideIcons.ticket,
+        title: 'Your tickets are being prepared',
+        message: 'This takes a few seconds. Try again in a moment.',
+        action: AppButton(
+          label: 'Try again',
+          variant: AppButtonVariant.dark,
+          onPressed: () => ref.invalidate(bookingProvider(widget.bookingId)),
+        ),
+      );
+    }
 
     if (event == null || tickets.isEmpty) {
       return MessageState(
@@ -100,8 +111,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
               child: _TicketCard(
                 booking: booking,
                 event: event,
-                type: tickets[index],
-                number: index + 1,
+                admission: tickets[index],
                 holder: holder,
               ),
             ),
@@ -149,25 +159,19 @@ class _TicketCard extends StatelessWidget {
   const _TicketCard({
     required this.booking,
     required this.event,
-    required this.type,
-    required this.number,
+    required this.admission,
     required this.holder,
   });
 
   final Booking booking;
   final BookingEvent event;
-  final String type;
-  final int number;
+  final Admission admission;
   final String holder;
-
-  /// "EH-3F9A2C-01"
-  String get _code =>
-      '${booking.orderNumber}-${number.toString().padLeft(2, '0')}';
 
   @override
   Widget build(BuildContext context) {
     final over = event.startsAt.toUtc().isBefore(DateTime.now().toUtc());
-    final valid = booking.isConfirmed && !over;
+    final valid = booking.isConfirmed && !over && !admission.isCheckedIn;
 
     return Container(
       decoration: BoxDecoration(
@@ -189,10 +193,14 @@ class _TicketCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      type.toUpperCase(),
+                      admission.ticketType.toUpperCase(),
                       style: context.overline.copyWith(color: context.muted),
                     ),
-                    _StatusBadge(booking: booking, over: over),
+                    _StatusBadge(
+                      booking: booking,
+                      over: over,
+                      used: admission.isCheckedIn,
+                    ),
                   ],
                 ),
                 Text(event.title, style: context.title),
@@ -218,38 +226,82 @@ class _TicketCard extends StatelessWidget {
               child: Column(
                 spacing: 14,
                 children: [
-                  Opacity(
-                    opacity: valid ? 1 : 0.25,
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: context.line),
-                        borderRadius: BorderRadius.circular(16),
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Opacity(
+                        opacity: valid ? 1 : 0.25,
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: context.line),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: QrImageView(
+                            data: admission.code, // signed by the backend
+                            size: 190,
+                            padding: EdgeInsets.zero,
+                            eyeStyle: QrEyeStyle(
+                              eyeShape: QrEyeShape.square,
+                              color: context.ink,
+                            ),
+                            dataModuleStyle: QrDataModuleStyle(
+                              dataModuleShape: QrDataModuleShape.square,
+                              color: context.ink,
+                            ),
+                          ),
+                        ),
                       ),
-                      child: QrImageView(
-                        // Signed by the backend. Without one (not paid yet) the QR is
-                        // dimmed and only shows the visible ticket number.
-                        data:
-                            booking.ticketCodes.elementAtOrNull(number - 1) ??
-                            _code,
-                        size: 190,
-                        padding: EdgeInsets.zero,
-                        eyeStyle: QrEyeStyle(
-                          eyeShape: QrEyeShape.square,
-                          color: context.ink,
+                      if (admission.isCheckedIn)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: context.surface,
+                            border: Border.all(color: context.line),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            'USED',
+                            style: context.badge.copyWith(
+                              color: context.ink,
+                              letterSpacing: 1,
+                            ),
+                          ),
                         ),
-                        dataModuleStyle: QrDataModuleStyle(
-                          dataModuleShape: QrDataModuleShape.square,
-                          color: context.ink,
-                        ),
+                    ],
+                  ),
+                  // Tap to copy: staff can type this when the QR does not scan.
+                  InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      await Clipboard.setData(
+                        ClipboardData(text: admission.shortCode),
+                      );
+                      messenger.showSnackBar(
+                        const SnackBar(content: Text('Ticket code copied')),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      child: Text(
+                        admission.shortCodeLabel,
+                        style: context.bodyStrong.copyWith(letterSpacing: 1.2),
                       ),
                     ),
                   ),
-                  Text(
-                    _code,
-                    style: context.bodyStrong.copyWith(letterSpacing: 1.2),
-                  ),
+                  if (admission.isCheckedIn)
+                    Text(
+                      'Checked in ${DateFormat('MMM d, h:mm a').format(admission.checkedInAt!)}',
+                      style: context.caption.copyWith(color: context.muted),
+                    ),
                 ],
               ),
             ),
@@ -261,10 +313,15 @@ class _TicketCard extends StatelessWidget {
 }
 
 class _StatusBadge extends StatelessWidget {
-  const _StatusBadge({required this.booking, required this.over});
+  const _StatusBadge({
+    required this.booking,
+    required this.over,
+    required this.used,
+  });
 
   final Booking booking;
   final bool over;
+  final bool used;
 
   @override
   Widget build(BuildContext context) {
@@ -279,8 +336,8 @@ class _StatusBadge extends StatelessWidget {
         const Color(0xFF9A5B00),
         const Color(0xFFFBF1E0),
       ),
-      BookingStatus.confirmed when over => (
-        'Used',
+      BookingStatus.confirmed when over || used => (
+        used ? 'Checked in' : 'Used',
         const Color(0xFF3F434A),
         const Color(0xFFEFEEEA),
       ),
