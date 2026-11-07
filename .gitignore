@@ -49,3 +49,6 @@ app.*.map.json
 
 # Local environment (copy env/dev.example.json to env/dev.json)
 env/dev.json
+
+# graphify knowledge graph output
+graphify-out/
