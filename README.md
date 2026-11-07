@@ -26,7 +26,8 @@ Screenshots: add 3-4 images to docs/screenshots/ and show them here, e.g.
   with a live countdown.
 - **Pay with Stripe** using the native payment sheet.
 - **Show your ticket** as a QR code signed by the backend, so it can be checked
-  at the door.
+  at the door. Each ticket has its own code, with a short version to tap and copy
+  when a QR will not scan, and a used ticket shows a USED label over a dimmed QR.
 - **Sign up, log in and reset a forgotten password** with a code sent by email.
   The session renews itself, so you are not logged out in the middle of a purchase.
 
