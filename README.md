@@ -1,11 +1,20 @@
 # Event Hub
 
-A mobile app for discovering events and buying tickets, built with Flutter.
-Find an event, pick your tickets, pay with a card, and walk in with a QR code.
+The mobile app of Event Hub, built with Flutter. Attendees find an event, pick
+their tickets, pay with a card and walk in with a QR code. Organizers and admins
+sign in to the same app to follow sales and check guests in at the door.
 
-This is the mobile client of a full-stack project. The backend is a separate
-ASP.NET Core API:
-[event-hub-DotNet](https://github.com/nguyen-duong-tien-phat/event-hub-DotNet).
+> **Note:** this is a local project, run on a simulator or a device against the
+> API on a developer machine. It is not published to an app store and not meant
+> for production.
+
+## The three repositories
+
+| Repo | What it is | Who uses it |
+|---|---|---|
+| [event-hub-DotNet](https://github.com/nguyen-duong-tien-phat/event-hub-DotNet) | The API (this repo): ASP.NET Core, PostgreSQL, Redis, Stripe, SQS and S3 on Floci | Both clients |
+| [event-hub-web](https://github.com/nguyen-duong-tien-phat/event-hub-web) | The dashboard: React and TypeScript | Organizers and admins (attendee accounts are refused at sign-in) |
+| [event-hub-flutter](https://github.com/nguyen-duong-tien-phat/event-hub-flutter) | The mobile app: Flutter | Attendees buy tickets; organizers and admins follow sales and check guests in |
 
 <!--
 Screenshots: add 3-4 images to docs/screenshots/ and show them here, e.g.
@@ -31,7 +40,7 @@ Screenshots: add 3-4 images to docs/screenshots/ and show them here, e.g.
 - **Sign up, log in and reset a forgotten password** with a code sent by email.
   The session renews itself, so you are not logged out in the middle of a purchase.
 
-**Organizers and admins** get a different, read-only app when they sign in:
+**Organizers and admins** get a different, read-only app when they sign in (the account's role decides which one, so nobody picks a mode):
 
 - **Follow sales.** Totals and a card per event (tickets sold, revenue, guests checked in), then each event's numbers by ticket type.
 - **Preview an event** exactly as an attendee sees it, with the buy button switched off.
@@ -50,7 +59,7 @@ Creating and editing events stays on the web dashboard.
 ![Stripe](https://img.shields.io/badge/Stripe-635BFF?logo=stripe&logoColor=white)
 ![iOS](https://img.shields.io/badge/iOS-000000?logo=ios&logoColor=white)
 
-The app currently targets iOS. It is built with Flutter 3.47 and Dart 3.13.
+The app currently targets iOS 15.5 or later. It is built with Flutter 3.47 and Dart 3.13.
 
 | Area | Technology | What it is used for in this app |
 | ---- | ---------- | ------------------------------- |
@@ -63,9 +72,10 @@ The app currently targets iOS. It is built with Flutter 3.47 and Dart 3.13.
 | Security | `uuid` | Creates the unique key sent with each booking so a retry never books twice. |
 | UI and design | Custom Material theme, Geist and Instrument Serif fonts, Lucide icons | The app's own look: colors, text styles, fonts, icons and skeleton loading placeholders. |
 | UI and design | `qr_flutter` | Draws the ticket QR code from the code signed by the backend. |
+| Camera | `mobile_scanner` | Reads the QR code on a guest's ticket for the organizer's check-in. |
 | UI and design | `intl` | Formats dates and prices for display. |
 | Code generation and quality | `build_runner`, `riverpod_generator`, `flutter_lints` | Generates the Riverpod provider code, and checks the code against Flutter's lint rules. |
-| Testing | `flutter_test` | Unit tests for the token refresh (with a fake HTTP adapter) and for page-by-page loading. |
+| Testing | `flutter_test` | 39 tests: the token refresh (with a fake HTTP adapter), page-by-page loading, and the organizer side (models, API answers to a check-in, the result screen and who is sent where). |
 
 ### Backend (separate repo)
 
@@ -91,6 +101,22 @@ flowchart LR
     F -->|declined| H[Payment failed]
     D -->|time runs out<br/>or user leaves| I[Tickets released]
     H --> E
+```
+
+## How a guest gets checked in
+
+```mermaid
+sequenceDiagram
+    actor G as Guest
+    actor O as Organizer
+    participant App
+    participant API as Backend
+
+    G->>O: Shows the ticket QR (or reads the short code)
+    O->>App: Scans it, or types the code
+    App->>API: POST /checkin
+    API-->>App: Admitted, already used, not paid, not your event or not valid
+    App-->>O: Result screen, then "Scan next"
 ```
 
 ## What I focused on
@@ -167,6 +193,18 @@ Every network failure is turned into a small set of typed errors (validation,
 conflict such as "tickets sold out", unauthorized, no connection, ...), each with
 a plain message. Screens never deal with raw HTTP exceptions.
 
+### 5. Check-in at the door
+
+The check-in answers with an HTTP status that tells the scanner what to show:
+200 let the guest in, 409 means already used or not paid, 403 not your event and
+400 not a ticket. Every one of those bodies carries the ticket's details, so the
+app treats them as results and not as errors (`ApiClient.post` takes a list of
+accepted statuses). The camera runs only while the Check-in tab is on screen and
+pauses while an answer is being shown, so one QR in view is never sent twice. If
+the camera is not available, or a QR will not scan, the short code can be typed.
+A refused scan never changes anything: the ticket is let in by a single atomic
+update on the server.
+
 ## How the app is organised
 
 ```mermaid
@@ -187,7 +225,7 @@ flowchart TB
     C -->|Dio + auth interceptor| BE[(Event Hub API)]
 ```
 
-The code is split by feature (`auth`, `events`, `bookings`, `saved`, `profile`),
+The code is split by feature (`auth`, `events`, `bookings`, `saved`, `profile`, `organizer`),
 and each feature has its own `data` and `presentation` folders. Shared pieces
 (networking, routing, theme, reusable widgets) live in `lib/core`.
 
@@ -199,7 +237,8 @@ lib/
     events/    home, discover, search, event details
     bookings/  tickets, checkout, payment, QR ticket
     saved/     saved events
-    profile/   profile tab
+    profile/   profile tab (organizers also see their totals here)
+    organizer/ events and sales, guests, bookings and check-in for organizers and admins
 ```
 
 ## Run it yourself
@@ -213,6 +252,10 @@ make run
 ```
 
 On a real device, `API_BASE_URL` must be your computer's LAN IP, not `localhost`.
+
+To see the organizer side, sign in with an organizer or admin account. The iOS
+simulator has no camera, so check-in there works by typing the code; scanning
+needs a real device.
 
 Other commands: `make test`, `make analyze`, `make gen-once` (regenerates the
 Riverpod `*.g.dart` files, which are committed).
