@@ -11,15 +11,25 @@ class AppNavigationBar extends StatelessWidget {
     super.key,
     required this.currentIndex,
     required this.onTap,
+    this.tabs = attendeeTabs,
   });
 
-  static const List<NavTab> tabs = [
+  static const List<NavTab> attendeeTabs = [
     (icon: LucideIcons.house, label: 'Home'),
     (icon: LucideIcons.ticket, label: 'Tickets'),
     (icon: LucideIcons.heart, label: 'Saved'),
     (icon: LucideIcons.userRound, label: 'Profile'),
   ];
 
+  /// Organizer and admin accounts.
+  static const List<NavTab> organizerTabs = [
+    (icon: LucideIcons.calendar, label: 'Events'),
+    (icon: LucideIcons.clipboardList, label: 'Bookings'),
+    (icon: LucideIcons.scanLine, label: 'Check-in'),
+    (icon: LucideIcons.userRound, label: 'Profile'),
+  ];
+
+  final List<NavTab> tabs;
   final int currentIndex;
   final ValueChanged<int> onTap;
 

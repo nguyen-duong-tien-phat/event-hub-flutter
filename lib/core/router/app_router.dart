@@ -12,6 +12,15 @@ import 'package:event_hub_mobile/features/bookings/presentation/screens/payment_
 import 'package:event_hub_mobile/features/bookings/presentation/screens/payment_screen.dart';
 import 'package:event_hub_mobile/features/bookings/presentation/screens/select_tickets_screen.dart';
 import 'package:event_hub_mobile/core/router/app_shell.dart';
+import 'package:event_hub_mobile/core/widgets/app_navigation_bar.dart';
+import 'package:event_hub_mobile/features/auth/data/models/user.dart';
+import 'package:event_hub_mobile/features/organizer/data/models/check_in_result.dart';
+import 'package:event_hub_mobile/features/organizer/presentation/screens/attendees_screen.dart';
+import 'package:event_hub_mobile/features/organizer/presentation/screens/check_in_result_screen.dart';
+import 'package:event_hub_mobile/features/organizer/presentation/screens/check_in_screen.dart';
+import 'package:event_hub_mobile/features/organizer/presentation/screens/organizer_bookings_screen.dart';
+import 'package:event_hub_mobile/features/organizer/presentation/screens/organizer_event_screen.dart';
+import 'package:event_hub_mobile/features/organizer/presentation/screens/organizer_events_screen.dart';
 import 'package:event_hub_mobile/features/bookings/presentation/screens/my_tickets_screen.dart';
 import 'package:event_hub_mobile/features/bookings/presentation/screens/ticket_detail_screen.dart';
 import 'package:event_hub_mobile/features/profile/presentation/screens/profile_screen.dart';
@@ -53,14 +62,24 @@ GoRouter appRouter(Ref ref) {
         return location == AppRoutes.splash ? null : AppRoutes.splash;
       }
 
-      final loggedIn = auth.value != null;
+      final user = auth.value;
+      final loggedIn = user != null;
+      // Organizers and admins use the /org screens; attendees never see them.
+      final isStaff = user != null && user.role != UserRole.attendee;
       if (location == AppRoutes.splash) {
         // Stay until the Splash has finished its hop and the reveal.
         if (!ref.read(splashDoneProvider)) return null;
-        return loggedIn ? AppRoutes.home : AppRoutes.welcome;
+        return user == null
+            ? AppRoutes.welcome
+            : AppRoutes.homeFor(user.role);
       }
       if (!loggedIn && !_authPaths.contains(location)) return AppRoutes.welcome;
-      if (loggedIn && _authPaths.contains(location)) return AppRoutes.home;
+      if (user != null && _authPaths.contains(location)) {
+        return AppRoutes.homeFor(user.role);
+      }
+      final inOrg = location.startsWith('/org');
+      if (isStaff && !inOrg) return AppRoutes.orgEvents;
+      if (loggedIn && !isStaff && inOrg) return AppRoutes.home;
 
       return null;
     },
@@ -105,6 +124,48 @@ GoRouter appRouter(Ref ref) {
               ],
             ),
         ],
+      ),
+      // The organizer's four tabs, with the same bar and behavior.
+      StatefulShellRoute.indexedStack(
+        builder: (_, _, shell) =>
+            AppShell(shell: shell, tabs: AppNavigationBar.organizerTabs),
+        branches: [
+          for (final (path, screen) in <(String, Widget)>[
+            (AppRoutes.orgEvents, const OrganizerEventsScreen()),
+            (AppRoutes.orgBookings, const OrganizerBookingsScreen()),
+            (AppRoutes.orgCheckIn, const CheckInScreen()),
+            (AppRoutes.orgProfile, const ProfileScreen()),
+          ])
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: path,
+                  pageBuilder: (_, state) =>
+                      NoTransitionPage(key: state.pageKey, child: screen),
+                ),
+              ],
+            ),
+        ],
+      ),
+      GoRoute(
+        path: AppRoutes.orgEventPattern,
+        builder: (_, state) =>
+            OrganizerEventScreen(id: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: AppRoutes.orgAttendeesPattern,
+        builder: (_, state) =>
+            AttendeesScreen(eventId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: AppRoutes.orgPreviewPattern,
+        builder: (_, state) =>
+            EventDetailScreen(id: state.pathParameters['id']!, preview: true),
+      ),
+      GoRoute(
+        path: AppRoutes.orgCheckInResult,
+        builder: (_, state) =>
+            CheckInResultScreen(result: state.extra! as CheckInResult),
       ),
       GoRoute(
         path: AppRoutes.ticketDetailPattern,

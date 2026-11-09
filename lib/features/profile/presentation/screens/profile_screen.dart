@@ -1,6 +1,12 @@
 import 'package:event_hub_mobile/core/theme/text_styles.dart';
 import 'package:event_hub_mobile/core/widgets/page_title.dart';
+import 'package:event_hub_mobile/features/auth/data/models/user.dart';
 import 'package:event_hub_mobile/features/auth/presentation/providers/auth_provider.dart';
+import 'package:event_hub_mobile/features/organizer/presentation/providers/organizer_providers.dart';
+import 'package:event_hub_mobile/features/organizer/presentation/widgets/organizer_widgets.dart';
+import 'package:event_hub_mobile/features/organizer/presentation/widgets/sales_summary_grid.dart';
+import 'package:event_hub_mobile/core/widgets/skeleton.dart';
+import 'package:event_hub_mobile/core/widgets/skeleton_pulse.dart';
 import 'package:event_hub_mobile/features/bookings/presentation/widgets/booking_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -45,9 +51,41 @@ class ProfileScreen extends ConsumerWidget {
                           ],
                         ),
                       ),
+                      if (user.role != UserRole.attendee)
+                        Pill(
+                          user.role == UserRole.admin ? 'Admin' : 'Organizer',
+                        ),
                     ],
                   ),
                   const SizedBox(height: 24),
+                  if (user.role != UserRole.attendee) ...[
+                    Text(
+                      'YOUR NUMBERS',
+                      style: context.overline.copyWith(color: context.muted),
+                    ),
+                    const SizedBox(height: 10),
+                    ref
+                        .watch(organizerSalesProvider)
+                        .when(
+                          loading: () => const SkeletonPulse(
+                            child: Column(
+                              spacing: 10,
+                              children: [
+                                Skeleton(height: 96, radius: 16),
+                                Skeleton(height: 96, radius: 16),
+                              ],
+                            ),
+                          ),
+                          error: (_, _) => Text(
+                            'Couldn’t load your numbers.',
+                            style: context.bodySmall.copyWith(
+                              color: context.muted,
+                            ),
+                          ),
+                          data: (sales) => SalesSummaryGrid(sales: sales),
+                        ),
+                    const SizedBox(height: 24),
+                  ],
                 ],
                 Align(
                   alignment: Alignment.centerLeft,

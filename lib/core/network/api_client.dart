@@ -43,14 +43,29 @@ class ApiClient {
     Map<String, dynamic>? queryParameters,
     dynamic data,
     Map<String, dynamic>? headers,
+    Set<int> acceptedStatuses = const {},
     T Function(dynamic json)? parser,
   }) async {
+    // By default only 2xx counts as success. [acceptedStatuses] lets a few
+    // other codes through when the body of that answer is the data we want
+    // (check-in answers 409 for "already used" with the ticket's details).
+    final options = headers == null && acceptedStatuses.isEmpty
+        ? null
+        : Options(
+            headers: headers,
+            validateStatus: acceptedStatuses.isEmpty
+                ? null
+                : (status) =>
+                      status != null &&
+                      ((status >= 200 && status < 300) ||
+                          acceptedStatuses.contains(status)),
+          );
     return _send(
       () => _dio.post(
         path,
         queryParameters: queryParameters,
         data: data,
-        options: headers == null ? null : Options(headers: headers),
+        options: options,
       ),
       parser,
     );

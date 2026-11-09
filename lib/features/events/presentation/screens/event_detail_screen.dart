@@ -25,8 +25,12 @@ const double _heroHeight = 300;
 const double _sheetOverlap = 20;
 
 class EventDetailScreen extends ConsumerWidget {
-  const EventDetailScreen({super.key, required this.id});
+  const EventDetailScreen({super.key, required this.id, this.preview = false});
   final String id;
+
+  /// An organizer looking at their own event the way an attendee sees it:
+  /// same page, but nothing can be saved or bought.
+  final bool preview;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -39,15 +43,16 @@ class EventDetailScreen extends ConsumerWidget {
           notFound: error is NotFoundException,
           onRetry: () => ref.invalidate(eventDetailProvider(id)),
         ),
-        data: (event) => _Content(event: event),
+        data: (event) => _Content(event: event, preview: preview),
       ),
     );
   }
 }
 
 class _Content extends StatelessWidget {
-  const _Content({required this.event});
+  const _Content({required this.event, this.preview = false});
   final Event event;
+  final bool preview;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +74,7 @@ class _Content extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                _Hero(imageUrl: event.imageUrl),
+                _Hero(imageUrl: event.imageUrl, preview: preview),
                 Transform.translate(
                   offset: const Offset(0, -_sheetOverlap),
                   child: EventSheet(
@@ -86,7 +91,7 @@ class _Content extends StatelessWidget {
           top: 0,
           left: 0,
           right: 0,
-          child: _TopBar(eventId: event.id),
+          child: _TopBar(eventId: event.id, preview: preview),
         ),
         Positioned(
           bottom: 0,
@@ -96,6 +101,7 @@ class _Content extends StatelessWidget {
             eventId: event.id,
             cheapestPrice: cheapest,
             soldOut: soldOut,
+            preview: preview,
           ),
         ),
       ],
@@ -104,8 +110,9 @@ class _Content extends StatelessWidget {
 }
 
 class _Hero extends StatelessWidget {
-  const _Hero({required this.imageUrl});
+  const _Hero({required this.imageUrl, this.preview = false});
   final String imageUrl;
+  final bool preview;
 
   @override
   Widget build(BuildContext context) {
@@ -114,12 +121,44 @@ class _Hero extends StatelessWidget {
     return SizedBox(
       height: _heroHeight,
       width: double.infinity,
-      child: Image.network(
-        imageUrl,
-        fit: BoxFit.cover,
-        loadingBuilder: (context, child, progress) =>
-            progress == null ? child : placeholder,
-        errorBuilder: (context, error, stackTrace) => placeholder,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.network(
+            imageUrl,
+            fit: BoxFit.cover,
+            loadingBuilder: (context, child, progress) =>
+                progress == null ? child : placeholder,
+            errorBuilder: (context, error, stackTrace) => placeholder,
+          ),
+          if (preview)
+            Positioned(
+              left: 20,
+              right: 20,
+              bottom: _sheetOverlap + 14,
+              child: Center(
+                child: Container(
+                  height: 32,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: context.ink.withValues(alpha: 0.78),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: 6,
+                    children: [
+                      const Icon(LucideIcons.eye, size: 14, color: Colors.white),
+                      Text(
+                        'Preview · how attendees see this event',
+                        style: context.metaStrong.copyWith(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -127,7 +166,10 @@ class _Hero extends StatelessWidget {
 
 /// Back / share / save buttons floating over the photo.
 class _TopBar extends StatelessWidget {
-  const _TopBar({this.eventId});
+  const _TopBar({this.eventId, this.preview = false});
+
+  /// Saving is left out: an organizer previewing has nothing to save.
+  final bool preview;
 
   /// Share and save are shown for this event. Null while it is loading or
   /// failed to load.
@@ -156,7 +198,7 @@ class _TopBar extends StatelessWidget {
                     icon: LucideIcons.share,
                     tooltip: 'Share',
                   ),
-                  HeartButton.onPhoto(eventId: eventId!, size: 40),
+                  if (!preview) HeartButton.onPhoto(eventId: eventId!, size: 40),
                 ],
               ),
           ],
@@ -202,11 +244,15 @@ class _BottomBar extends StatelessWidget {
     required this.eventId,
     required this.cheapestPrice,
     required this.soldOut,
+    this.preview = false,
   });
 
   final String eventId;
   final double? cheapestPrice;
   final bool soldOut;
+
+  /// The button is shown but cannot be used.
+  final bool preview;
 
   @override
   Widget build(BuildContext context) {
@@ -220,7 +266,7 @@ class _BottomBar extends StatelessWidget {
             )
           : BottomBarLabel(caption: 'From', value: formatPrice(price)),
       actionLabel: soldOut ? 'Sold out' : 'Get tickets',
-      onPressed: soldOut || price == null
+      onPressed: preview || soldOut || price == null
           ? null
           : () => context.push(AppRoutes.selectTickets(eventId)),
     );

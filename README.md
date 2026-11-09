@@ -31,6 +31,15 @@ Screenshots: add 3-4 images to docs/screenshots/ and show them here, e.g.
 - **Sign up, log in and reset a forgotten password** with a code sent by email.
   The session renews itself, so you are not logged out in the middle of a purchase.
 
+**Organizers and admins** get a different, read-only app when they sign in:
+
+- **Follow sales.** Totals and a card per event (tickets sold, revenue, guests checked in), then each event's numbers by ticket type.
+- **Preview an event** exactly as an attendee sees it, with the buy button switched off.
+- **See who is coming.** The guest list with search and a checked-in filter, and the bookings on their events.
+- **Check guests in at the door** by scanning the ticket's QR code with the camera, or by typing its short code. The answer is clear at a glance: admitted, already used (and when), not paid, not your event, or not a ticket.
+
+Creating and editing events stays on the web dashboard.
+
 ## Tech stack
 
 ![Flutter](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white)

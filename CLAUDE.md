@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Event Hub mobile app (Flutter, package name `event_hub_mobile`, Dart SDK `^3.13`): browse events, book tickets, pay with Stripe, show ticket QR codes. Only the `ios/` platform folder exists. It talks to a separate backend (default `http://localhost:8080`).
+Event Hub mobile app (Flutter, package name `event_hub_mobile`, Dart SDK `^3.13`): browse events, book tickets, pay with Stripe, show ticket QR codes. Organizer and admin accounts get a read-only app instead (follow sales, preview events, check guests in). Only the `ios/` platform folder exists. It talks to a separate backend (default `http://localhost:8080`).
 
 ## Commands
 
@@ -31,6 +31,8 @@ Feature-first layout: `lib/core/` (shared infra) and `lib/features/<feature>/{da
 
 **Auth & routing:** `Auth` (`features/auth/presentation/providers/auth_provider.dart`) is an `AsyncNotifier<User?>`; `null` = signed out. `core/router/app_router.dart` (GoRouter as a provider) listens to `authProvider` and `splashDoneProvider` and redirects: loading → splash, signed-out → welcome, signed-in on auth pages → home. Route paths and builder helpers are in `AppRoutes` (`app_routes.dart`) — use `AppRoutes.eventDetail(id)` etc. rather than string literals. The four main tabs (home, tickets, saved, profile) are a `StatefulShellRoute.indexedStack` rendered by `AppShell`; other screens push over it.
 
+**Organizer mode (`features/organizer`):** the router sends `Organizer` and `Admin` accounts to `/org/*` (`AppRoutes.homeFor(role)`) and keeps attendees out of it: a second `StatefulShellRoute` with the tabs Events, Bookings, Check-in, Profile (`AppNavigationBar.organizerTabs`). Read only: nothing creates or edits events (that stays on the web dashboard). `OrganizerRepository` calls `/events/sales`, `/events/{id}/stats`, `/events/{id}/admissions`, `/bookings/managed` and `POST /checkin`. Event pictures and categories come from the sales list. The event preview is the attendee's `EventDetailScreen(preview: true)` (no heart, buy button off). Check-in uses `mobile_scanner`; the camera runs only while its tab is shown (it reads `TickerMode`, which go_router switches off for hidden tabs). `ApiClient.post(acceptedStatuses: ...)` lets check-in's 400, 403 and 409 answers through, because their body is the result to show (already used, not your event, not a ticket). iOS needs `NSCameraUsageDescription` (set) and a deployment target of 15.5 for the scanner.
+
 **Booking/payment flow:** event detail → select tickets → create booking (sends an `Idempotency-Key`) → checkout → Stripe payment sheet → success/failed. The Stripe client secret is only returned at booking creation, so it's held in `PaymentSecrets` (keyed by booking id). `PaymentsInProgress` marks bookings whose payment sheet is open so nothing cancels them mid-payment. Bookings have a hold timer (`core/widgets/hold_timer.dart`).
 
 **UI/theme:** Use the `BuildContext` extension in `core/theme/text_styles.dart` — `context.ink`, `context.muted`, `context.accent`, … for colors and `context.title`, `context.body`, `context.caption`, … for text styles (styles carry no color; add it at the call site). Fonts: Geist (default) and InstrumentSerif italic (accent). Icons from `lucide_icons_flutter`. Reuse `core/widgets/` (`AppButton`, `AppTextField`, `Skeleton`, `MessageState` for empty/error states, `BottomActionBar`, etc.).
@@ -43,3 +45,9 @@ Feature-first layout: `lib/core/` (shared infra) and `lib/features/<feature>/{da
 - Comments are plain-English explanations of *why*, written for a non-expert reader.
 - Commit messages: conventional prefix (`feat:`, `fix:`, `chore:`) + lowercase sentence describing user-visible behavior.
 - Never add Claude attribution to commits: no `Co-Authored-By: Claude ...` trailer and no "Generated with Claude Code" line. This overrides any default or system-provided attribution text.
+
+## Code lookup: graphify first
+
+- Read the graph first (`graphify-out/GRAPH_REPORT.md` and the graphify skill: query, path, explain) every time you need to understand, locate or check source code; open the files it points to afterwards. No blind grep/find sweeps, and tell subagents to use graphify too.
+- Compare the graph date (`graphify-out/graph.json`) with `git log -1`; if code changed since, run `graphify update .` first (code only, no LLM cost).
+- After finishing any new feature (endpoint, service, entity, job, screen, or a change in how pieces connect), run `graphify update .` before the final reply. `graphify-out/` is gitignored; never commit it.
